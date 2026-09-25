@@ -1,0 +1,245 @@
+/* ── Google Fonts (must come before @import "tailwindcss") ────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap");
+
+/* ── Tailwind CSS v4 Base Import ──────────────────────────────────────────── */
+@import "tailwindcss";
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DESIGN SYSTEM — Coastal Heritage (Tailwind v4 @theme)
+   All CSS custom properties here become Tailwind utility classes automatically.
+   ════════════════════════════════════════════════════════════════════════════ */
+@theme {
+  /* ── Colors ───────────────────────────────────────────────────────────── */
+  --color-surface:                    #fff8f2;
+  --color-surface-bright:             #fff8f2;
+  --color-surface-dim:                #eed7ad;
+  --color-surface-container-lowest:   #ffffff;
+  --color-surface-container-low:      #fff2de;
+  --color-surface-container:          #ffecc9;
+  --color-surface-container-high:     #fde5ba;
+  --color-surface-container-highest:  #f7e0b5;
+  --color-surface-variant:            #f7e0b5;
+  --color-surface-tint:               #a93700;
+  --color-on-surface:                 #251a01;
+  --color-on-surface-variant:         #594139;
+  --color-background:                 #fff8f2;
+  --color-on-background:              #251a01;
+  --color-inverse-surface:            #3c2f11;
+  --color-inverse-on-surface:         #ffefd4;
+
+  /* Terracotta – primary */
+  --color-primary:                    #973100;
+  --color-primary-container:          #c04000;
+  --color-primary-fixed:              #ffdbcf;
+  --color-primary-fixed-dim:          #ffb59b;
+  --color-on-primary:                 #ffffff;
+  --color-on-primary-container:       #ffe9e3;
+  --color-on-primary-fixed:           #380d00;
+  --color-on-primary-fixed-variant:   #812800;
+  --color-inverse-primary:            #ffb59b;
+
+  /* Ocean – secondary */
+  --color-secondary:                  #2a6865;
+  --color-secondary-container:        #b1eeea;
+  --color-secondary-fixed:            #b1eeea;
+  --color-secondary-fixed-dim:        #95d1ce;
+  --color-on-secondary:               #ffffff;
+  --color-on-secondary-container:     #316e6b;
+  --color-on-secondary-fixed:         #00201f;
+  --color-on-secondary-fixed-variant: #084f4d;
+
+  /* Palm – tertiary */
+  --color-tertiary:                   #345d29;
+  --color-tertiary-container:         #4c763f;
+  --color-tertiary-fixed:             #c0f0ad;
+  --color-tertiary-fixed-dim:         #a4d393;
+  --color-on-tertiary:                #ffffff;
+  --color-on-tertiary-container:      #cbfbb7;
+  --color-on-tertiary-fixed:          #022100;
+  --color-on-tertiary-fixed-variant:  #28501e;
+
+  /* Utility */
+  --color-outline:                    #8d7167;
+  --color-outline-variant:            #e1bfb4;
+  --color-error:                      #ba1a1a;
+  --color-error-container:            #ffdad6;
+  --color-on-error:                   #ffffff;
+  --color-on-error-container:         #93000a;
+
+  /* ── Typography ───────────────────────────────────────────────────────── */
+  --font-family-serif:    "EB Garamond", Georgia, serif;
+  --font-family-sans:     "Hanken Grotesk", system-ui, sans-serif;
+  --font-family-icons:    "Material Symbols Outlined";
+
+  /* ── Border Radius ────────────────────────────────────────────────────── */
+  --radius-sm:   0.125rem;
+  --radius:      0.25rem;
+  --radius-md:   0.375rem;
+  --radius-lg:   0.5rem;
+  --radius-xl:   0.75rem;
+  --radius-2xl:  1rem;
+  --radius-3xl:  1.5rem;
+  --radius-full: 9999px;
+
+  /* ── Spacing extras ───────────────────────────────────────────────────── */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* ── Box Shadows ──────────────────────────────────────────────────────── */
+  --shadow-coastal:      0 20px 40px -15px rgba(42, 104, 101, 0.08);
+  --shadow-card:         0 4px 24px -4px rgba(42, 30, 1, 0.08);
+  --shadow-card-hover:   0 16px 40px -8px rgba(42, 30, 1, 0.14);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MATERIAL SYMBOLS (Icon Font)
+   ════════════════════════════════════════════════════════════════════════════ */
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  user-select: none;
+  vertical-align: middle;
+  /* Prevent the transition rule below from affecting icon rendering */
+  transition: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   GLOBAL BASE STYLES
+   ════════════════════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fff8f2;
+  color: #251a01;
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* ── Smooth interaction transitions ──────────────────────────────────────── */
+a, button, input, select, textarea {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+/* ── Custom utilities ─────────────────────────────────────────────────────── */
+
+/* Azulejos tile background pattern (subtle Goan tile motif) */
+.azulejos-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232a6865' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Proverb hero card: warm gradient wash */
+.proverb-hero-bg {
+  background: linear-gradient(135deg, #fff8f2 0%, #ffecc9 40%, #fff2de 100%);
+}
+
+/* Coastal shadow utility */
+.shadow-coastal {
+  box-shadow: 0 20px 40px -15px rgba(42, 104, 101, 0.08);
+}
+
+/* Card hover shadow */
+.shadow-card {
+  box-shadow: 0 4px 24px -4px rgba(42, 30, 1, 0.08);
+}
+
+.shadow-card-hover:hover {
+  box-shadow: 0 16px 40px -8px rgba(42, 30, 1, 0.14);
+}
+
+/* ── Typography helpers ─────────────────────────────────────────────────── */
+.font-serif {
+  font-family: "EB Garamond", Georgia, serif;
+}
+
+.font-sans {
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+/* Konkani display text (large, authoritative) */
+.text-display {
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #2a6865;
+}
+
+/* Proverb block (idiom text) */
+.text-proverb {
+  font-family: "EB Garamond", Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #973100;
+}
+
+/* Transliteration (secondary romanized text) */
+.text-transliteration {
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+  font-size: 1rem;
+  color: #594139;
+  font-style: italic;
+}
+
+/* ── Scrollbar styling ─────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #fff2de;
+}
+::-webkit-scrollbar-thumb {
+  background: #e1bfb4;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8d7167;
+}
+
+/* ── Focus ring ─────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #2a6865;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Sidebar navigation active state ───────────────────────────────────── */
+.nav-link-active {
+  background-color: #b1eeea;
+  color: #084f4d;
+  font-weight: 700;
+}
+
+/* ── Category filter chip ───────────────────────────────────────────────── */
+.chip-active {
+  background-color: #2a6865;
+  color: #ffffff;
+}
+
+/* ── Idiom card left-border featured accent ─────────────────────────────── */
+.card-featured {
+  border-left: 4px solid #c04000;
+  background: linear-gradient(to bottom right, #ffffff, #fffcf8);
+}

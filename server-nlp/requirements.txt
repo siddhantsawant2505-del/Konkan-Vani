@@ -1,0 +1,7 @@
+sentence-transformers
+rapidfuzz
+fastapi
+uvicorn[standard]
+pydantic
+pandas
+numpy
