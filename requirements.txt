@@ -1,0 +1,15 @@
+datasets
+huggingface_hub
+pandas
+requests
+beautifulsoup4
+wikiextractor
+sentence-transformers
+scikit-learn
+langdetect
+indic-nlp-library
+rapidfuzz
+faiss-cpu
+fastapi
+uvicorn[standard]
+numpy

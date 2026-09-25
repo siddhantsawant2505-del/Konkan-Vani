@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "ui-ux-pro-max": {
+      "source": "guanyang/antigravity-skills",
+      "sourceType": "github",
+      "skillPath": "skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "b987567a065af3c786bb290b25e3fdb9328083d4f4c0a6ed3ee4a4cbeb09ff69"
+    }
+  }
+}
