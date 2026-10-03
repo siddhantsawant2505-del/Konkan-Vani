@@ -15,6 +15,7 @@ if _SERVER_DIR not in sys.path:
 
 from app.routers.health import router as health_router
 from app.routers.resolve import router as resolve_router
+from app.routers.search import router as search_router
 
 app = FastAPI(
     title="Konkan Vani NLP Server",
@@ -40,6 +41,7 @@ app.add_middleware(
 # Include routers
 app.include_router(health_router)
 app.include_router(resolve_router)
+app.include_router(search_router)
 
 if __name__ == "__main__":
     import uvicorn

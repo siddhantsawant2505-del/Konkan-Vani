@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+venv/
+.venv/
+env/
+ENV/
+
+# FastAPI / Uvicorn
+*.log
+*.pid
+
+# Node / Next.js
+node_modules/
+client/node_modules/
+.next/
+client/.next/
+out/
+client/out/
+coverage/
+.npm/
+.eslintcache
+*.tsbuildinfo
+
+# Build artifacts
+build/
+dist/
+*.egg/
+*.whl
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# IDE / editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Project-generated ML / index artifacts
+data/**/*.npy
+data/**/*.npz
+data/**/*.index
+data/**/*.bin
+data/**/*.pkl
+server-nlp/**/*.pyc
+server-nlp/__pycache__/
+**/__pycache__/
+
+# Optional: keep data source files tracked if needed
+# Uncomment these if your dataset files should be versioned:
+# !data/**/*.csv
+# !data/**/*.json

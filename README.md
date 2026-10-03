@@ -109,7 +109,7 @@ The platform operates on a decoupled client-server model with a multi-stage NLP 
 ```
 Konkan-Vani/
 ├── build_index.bat               # Windows batch script to trigger vector index build
-├── requirements.txt              # Root Python dependencies for model training & backend
+├── requirements.txt              # Root Python dependencies for data pipeline & backend
 ├── task.md                       # Comprehensive phase checklist & completion log
 ├── README.md                     # Technical README & system build documentation
 ├── client/                       # Next.js 16 Frontend Web Application
@@ -127,22 +127,29 @@ Konkan-Vani/
 │   │   ├── core/
 │   │   │   ├── query_pipeline.py # 3-Stage Resolver Engine (Fuzzy -> Semantic -> Fallback)
 │   │   │   ├── phonetic_normalize.py # Devanagari & Romanized phonetic key cleaner
-│   │   │   └── dynamic_fallback.py  # Fallback response generator
+│   │   │   └── dynamic_fallback.py  # Optional fallback response generator
 │   │   └── routers/
 │   │       ├── health.py         # GET /health healthcheck endpoint
 │   │       ├── resolve.py        # POST /api/resolve low-level resolution endpoint
 │   │       └── search.py         # GET /api/search, /api/browse, /api/stats endpoints
+│   ├── scripts/                  # NLP testing & pipeline build utilities
+│   │   ├── build_embeddings.py   # Encodes idioms via LaBSE into data/idiom_embeddings.npy
+│   │   ├── test_pipeline.py      # Automated 12-test suite for phonetic & semantic matching
+│   │   ├── smoke_test.py         # Live HTTP smoke test against running server
+│   │   └── diagnose_matches.py   # Diagnostic script for query matching
+│   ├── run_server.py             # Alternative direct launcher with path resolution
 │   ├── Dockerfile                # Production Docker container manifest
-│   └── requirements.txt          # Server specific dependencies
-├── data/                         # Datasets & Generated Vector Indexes
+│   └── requirements.txt          # Server-specific dependencies
+├── data/                         # Datasets & Generated Vector Indexes (git-ignored / generated)
 │   ├── idiom_embeddings.npy      # Precomputed LaBSE dense embeddings (5200 x 768)
 │   └── processed/
 │       ├── idioms_with_phonetic_keys.csv  # Scaled 5,200 gold dataset
 │       └── index/
 │           ├── konkani.index     # FAISS vector index
 │           └── konkani_meta.json # Parallel metadata store
-└── src/                          # Data Preparation & Pipeline Scripts
-    ├── build_index.py            # Generates LaBSE embeddings & builds FAISS index
+└── src/                          # Data Preparation & Indexing Scripts
+    ├── rebuild_dataset.py        # Self-contained builder for the 5,200 gold dataset
+    ├── build_index.py            # Compiles FAISS vector index from embeddings & CSV
     ├── scale_dataset.py          # Data scaling & translation augmentation script
     ├── audit_data.py             # Data integrity auditor (duplicate & missing checks)
     └── preprocessing.py          # Script conversion & text normalization utilities
@@ -152,43 +159,78 @@ Konkan-Vani/
 
 ## ⚡ Quick Start & Run Instructions
 
-### 1. Prerequisites
-- **Python**: Version `3.10` or higher
-- **Node.js**: Version `18.0` or higher (with `npm` or `pnpm`)
+### 1. Prerequisites & Environment
+- **Python**: Version `3.10` or higher (verified on Python `3.12.5`)
+- **Node.js**: Version `18.0` or higher (verified on Node `v22.16.0` / npm `11.20.0`)
+- **OS**: Windows / Linux / macOS (On Windows, ensure `-X utf8` flag is used when running Python scripts to support Devanagari characters).
 
-### 2. Backend Setup & Run
+### 2. Python Dependencies Installation
 
+From the project root:
 ```bash
-# Navigate to repository root
-cd Konkan-Vani
-
-# Install Python dependencies
+# Install root dependencies
 pip install -r requirements.txt
-
-# (Optional) Re-build FAISS vector index if data changed
-python -X utf8 src/build_index.py
-
-# Launch FastAPI NLP Server
-cd server-nlp
-python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
-The NLP Server will start at **`http://127.0.0.1:8000`**. You can view interactive OpenAPI documentation at `http://127.0.0.1:8000/docs`.
+### 3. Data & Vector Index Setup (Required on Fresh Clones)
 
-### 3. Frontend Setup & Run
+The precomputed datasets and vector embeddings are stored in `data/`. If setting up for the first time or if `data/` is missing, run the following steps in sequence:
 
 ```bash
-# Open a new terminal in client directory
-cd Konkan-Vani/client
+# Step 1: Generate the gold dataset CSV (5,200 idioms)
+python -X utf8 src/rebuild_dataset.py
+
+# Step 2: Precompute LaBSE neural embeddings (generates data/idiom_embeddings.npy)
+python server-nlp/scripts/build_embeddings.py
+
+# Step 3: Compile the FAISS vector index & metadata
+python -X utf8 src/build_index.py
+# (On Windows, you can also simply run: build_index.bat)
+```
+
+### 4. Running the NLP Server
+
+```bash
+# Option A: From server-nlp directory with Uvicorn (Hot-Reload)
+cd server-nlp
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+# Option B: Using run_server launcher from project root
+python server-nlp/run_server.py
+```
+
+- **API Base**: `http://127.0.0.1:8000`
+- **Interactive OpenAPI Documentation**: `http://127.0.0.1:8000/docs`
+- **Health Check**: `http://127.0.0.1:8000/health`
+
+### 5. Running the Frontend Client
+
+In a separate terminal:
+```bash
+# Navigate to client directory
+cd client
 
 # Install Node dependencies
 npm install
 
-# Start Next.js Development Server
+# Launch Next.js Development Server
 npm run dev
 ```
 
-The Web Application will start at **`http://localhost:3000`**.
+- **Web Portal URL**: `http://localhost:3000`
+- **Backend URL Config (Optional)**: Defaults to `http://localhost:8000`. To customize, set `NEXT_PUBLIC_API_URL` in `client/.env.local`.
+
+### 6. Running Verification & Test Suites
+
+To verify that the dataset, phonetic fuzzy match, and FAISS vector search pipeline are functioning correctly:
+
+```bash
+# Run pipeline test suite (12/12 test assertions)
+python server-nlp/scripts/test_pipeline.py
+
+# Run live server smoke test (requires server running on port 8000)
+python server-nlp/scripts/smoke_test.py
+```
 
 ---
 

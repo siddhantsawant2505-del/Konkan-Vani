@@ -224,6 +224,30 @@ def main():
             "cultural_context": "Konkani proverb about home and belonging, common in Goan emigrant families.",
             "source": "curated:user_contributed_2026-09-21",
         },
+        {
+            "konkani_text": "सुसेगाद रावप",
+            "romanized_text": "Susegad ravop",
+            "marathi_meaning": "शांत, समाधानी आणि निवांत जीवन जगणे — अनावश्यक घाई आणि ताण न घेणे",
+            "english_meaning": "To live peacefully, contentedly and unhurriedly without undue stress",
+            "figurative_meaning": "Embracing a state of tranquil satisfaction, inner peace, and unhurried contentment in life",
+            "literal_meaning": "To stay / remain in a peaceful, quiet state",
+            "example_sentence": "धांवपळ सोड आणि थोडो वेळ सुसेगाद रावप शीक.",
+            "category": "Wisdom & Life Lessons",
+            "cultural_context": "The quintessential Goan Konkani philosophy of relaxed contentment and peace of mind (from Portuguese sossegado).",
+            "source": "curated:cultural_heritage",
+        },
+        {
+            "konkani_text": "सुसेगाद मनशान संवसार जिखलो",
+            "romanized_text": "Susegad manshan sonvsar jikhlo",
+            "marathi_meaning": "शांत आणि संयमी माणसाने जग जिंकले — घाईने नव्हे तर संयमाने आणि समाधानाने यश मिळते",
+            "english_meaning": "The peaceful, patient mind conquers the world — patience triumphs over anxiety and haste",
+            "figurative_meaning": "A calm, unperturbed mind achieves greater success and lasting happiness than frantic rushing",
+            "literal_meaning": "A tranquil person conquered the world",
+            "example_sentence": "घाई करून काय साध्य जायना — सुसेगाद मनशान संवसार जिखलो म्हणटात.",
+            "category": "Wisdom & Life Lessons",
+            "cultural_context": "Traditional Konkani proverb emphasizing equanimity and patient perseverance over reckless urgency.",
+            "source": "curated:cultural_heritage",
+        },
     ]
 
     # Backup old dataset

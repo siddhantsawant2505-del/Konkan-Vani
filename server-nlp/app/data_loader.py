@@ -130,6 +130,11 @@ class IdiomStore:
     def get_embedding(self, idx: int) -> np.ndarray:
         return self.embeddings[idx]
 
+    def get_categories(self) -> list[str]:
+        if "category" in self.df.columns:
+            return sorted([str(c) for c in self.df["category"].dropna().unique() if str(c).strip()])
+        return []
+
 
 # Singleton loaded once at import time
 store = IdiomStore()

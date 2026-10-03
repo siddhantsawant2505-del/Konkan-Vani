@@ -13,8 +13,11 @@ Two-stage matching pipeline:
 
 import sys
 import os
+import logging
 import numpy as np
 from rapidfuzz import fuzz, process
+
+logger = logging.getLogger(__name__)
 
 # Ensure server-nlp root directory is on sys.path
 _SERVER_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
@@ -187,3 +190,101 @@ def resolve_idiom(text: str, store) -> dict:
             return {"matched": False}
 
     return result
+
+
+def search_idioms(query: str, top_k: int = 10) -> list[dict]:
+    """
+    Multi-result hybrid search combining substring, phonetic fuzzy matching,
+    and semantic vector search. Returns up to top_k ranked matches.
+    """
+    if not query or not query.strip():
+        return []
+
+    q = query.strip()
+    q_norm = q.lower()
+    query_key = phonetic_normalize(q)
+    results = []
+    seen_ids = set()
+
+    # 1. Exact or partial substring matching in Romanized or Devanagari text
+    for idx in range(store.count):
+        row = store.get_row(idx)
+        rom = row.get("romanized_text", "").lower()
+        konk = row.get("konkani_text", "")
+        if q_norm and (q_norm in rom or q in konk):
+            seen_ids.add(idx)
+            entry = dict(row)
+            entry["id"] = str(idx)
+            entry["match_type"] = "exact" if (q_norm == rom or q == konk) else "phonetic"
+            entry["confidence"] = 1.0 if entry["match_type"] == "exact" else 0.95
+            entry["matched_on"] = "romanized_text" if q_norm in rom else "konkani_text"
+            results.append(entry)
+            if len(results) >= top_k:
+                break
+
+    # 2. Phonetic / String Fuzzy Matching via rapidfuzz
+    import re
+    is_devanagari = bool(re.search(r'[\u0900-\u097F]', q))
+
+    if is_devanagari and query_key:
+        konkani_texts = [str(x) for x in store.df["konkani_text"].fillna("")]
+        top_fuzzy = process.extract(
+            query_key,
+            konkani_texts,
+            scorer=fuzz.token_sort_ratio,
+            limit=top_k,
+            score_cutoff=FUZZY_THRESHOLD,
+        )
+        for match_text, score, idx in top_fuzzy:
+            if idx not in seen_ids:
+                seen_ids.add(idx)
+                row = store.get_row(idx)
+                entry = dict(row)
+                entry["id"] = str(idx)
+                entry["match_type"] = "phonetic"
+                entry["confidence"] = round(score / 100.0, 4)
+                entry["matched_on"] = "konkani_text"
+                results.append(entry)
+
+    stored_keys = store.all_phonetic_keys()
+    indexed_keys = [(i, key) for i, key in enumerate(stored_keys) if key]
+    if query_key and indexed_keys:
+        top_fuzzy = process.extract(
+            query_key,
+            [key for _, key in indexed_keys],
+            scorer=fuzz.token_sort_ratio,
+            limit=top_k,
+            score_cutoff=FUZZY_THRESHOLD,
+        )
+        for match_text, score, m_idx in top_fuzzy:
+            orig_idx = indexed_keys[m_idx][0]
+            if orig_idx not in seen_ids:
+                seen_ids.add(orig_idx)
+                row = store.get_row(orig_idx)
+                entry = dict(row)
+                entry["id"] = str(orig_idx)
+                entry["match_type"] = "phonetic"
+                entry["confidence"] = round(score / 100.0, 4)
+                entry["matched_on"] = "phonetic_key"
+                results.append(entry)
+
+    # 3. Semantic Search using LaBSE embedding + FAISS (or brute-force)
+    try:
+        query_emb = _encode([q])[0]
+        sem_matches = store.faiss_search(query_emb, top_k=top_k)
+        for idx, sim in sem_matches:
+            if sim >= SEMANTIC_THRESHOLD and idx not in seen_ids:
+                seen_ids.add(idx)
+                row = store.get_row(idx)
+                entry = dict(row)
+                entry["id"] = str(idx)
+                entry["match_type"] = "semantic"
+                entry["confidence"] = round(float(sim), 4)
+                entry["matched_on"] = "semantic_embedding"
+                results.append(entry)
+    except Exception as e:
+        logger.warning(f"Semantic search error in search_idioms: {e}")
+
+    results.sort(key=lambda x: x.get("confidence", 0.0), reverse=True)
+    return results[:top_k]
+

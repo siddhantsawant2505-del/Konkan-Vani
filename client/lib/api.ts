@@ -145,12 +145,16 @@ function searchIdiomsLocal(query: string): SearchResponse {
       (idiom.phonetic_key && idiom.phonetic_key.includes(q))
   );
 
-  const results = (matched.length > 0 ? matched : PLACEHOLDER_IDIOMS.slice(0, 3)).map((idiom, i) => {
+  if (matched.length === 0) {
+    return { query, results: [], total: 0 };
+  }
+
+  const results = matched.map((idiom, i) => {
     const isPhonetic = idiom.phonetic_key?.includes(q) || idiom.romanized_text.toLowerCase().includes(q);
     return {
       idiom,
       match_type: (isPhonetic ? "phonetic" : "semantic") as "phonetic" | "semantic",
-      confidence: matched.length > 0 ? (i === 0 ? 0.94 : 0.78) : 0.65,
+      confidence: i === 0 ? 0.94 : 0.78,
       matched_on: isPhonetic ? "phonetic_key" : "semantic_embedding",
     };
   });
