@@ -1,14 +1,18 @@
 """
 Konkan Vani — Index Builder
 =============================
-Loads the gold idiom CSV and pre-computed LaBSE embeddings,
-builds a FAISS index for fast semantic search.
+Loads the gold idiom CSV and pre-computed embeddings (built by
+build_embeddings.py), then builds a FAISS IndexFlatIP for fast cosine-
+similarity search at query time.
+
+The validation queries at the end are encoded with the same model the
+runtime server uses (model_registry → custom model or LaBSE fallback).
 
 Usage:
     python -X utf8 src/build_index.py
 
 Output:
-    data/processed/index/konkani.index   (FAISS index file)
+    data/processed/index/konkani.index    (FAISS index file)
     data/processed/index/konkani_meta.json (parallel metadata)
 """
 
@@ -26,9 +30,14 @@ logger = logging.getLogger(__name__)
 
 # Paths
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IDIOMS_CSV = os.path.join("data", "processed", "idioms_with_phonetic_keys.csv")
-EMBEDDINGS_NPY = os.path.join("data", "idiom_embeddings.npy")
-INDEX_DIR = os.path.join("data", "processed", "index")
+IDIOMS_CSV = os.path.join(PROJECT_ROOT, "data", "processed", "idioms_with_phonetic_keys.csv")
+EMBEDDINGS_NPY = os.path.join(PROJECT_ROOT, "data", "idiom_embeddings.npy")
+INDEX_DIR = os.path.join(PROJECT_ROOT, "data", "processed", "index")
+
+# Make model_registry importable regardless of cwd
+_SERVER_NLP = os.path.join(PROJECT_ROOT, "server-nlp")
+if _SERVER_NLP not in sys.path:
+    sys.path.insert(0, _SERVER_NLP)
 
 
 def main():
@@ -119,7 +128,7 @@ def main():
     meta_size = os.path.getsize(meta_path) / (1024 * 1024)
     print(f"  ✓ Metadata saved ({meta_size:.1f} MB)")
 
-    # 7. Validation search
+    # 7. Validation search — encode with the same model as the runtime server
     print("\n--- Validation Search ---")
     test_queries = [
         "haat dakhvun ayaak",
@@ -127,15 +136,12 @@ def main():
         "modde maarpe",
     ]
 
+    from app.core import model_registry
     for query in test_queries:
-        # Encode query using same model (LaBSE)
-        from sentence_transformers import SentenceTransformer
-        model = SentenceTransformer("sentence-transformers/LaBSE")
-        q_emb = model.encode([query], normalize_embeddings=True).astype(np.float32)
-
-        scores, indices = index.search(q_emb, 3)
+        q_emb = model_registry.encode([query]).astype(np.float32)
+        scores, idx_list = index.search(q_emb, 3)
         print(f"\n  Query: '{query}'")
-        for rank, (idx, score) in enumerate(zip(indices[0], scores[0]), 1):
+        for rank, (idx, score) in enumerate(zip(idx_list[0], scores[0]), 1):
             meta = metadata[idx]
             print(f"    {rank}. [{score:.4f}] {meta['konkani_text'][:60]}  ({meta['category']})")
 

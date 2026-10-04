@@ -1,9 +1,13 @@
 """
 Konkan Vani — Embedding Builder
 ================================
-Loads sentence-transformers/LaBSE, encodes each idiom row as
-(konkani_text + " " + romanized_text), and saves vectors to
-data/idiom_embeddings.npy.
+Encodes each idiom row as (konkani_text + " " + romanized_text) using the
+fine-tuned ``konkan-vani-encoder-v1`` model (or LaBSE as fallback) and saves
+vectors to data/idiom_embeddings.npy.
+
+The model used here MUST match the model used by the live server
+(model_registry.py) so that query embeddings and corpus embeddings are in the
+same vector space.
 
 Usage:
     python server-nlp/scripts/build_embeddings.py
@@ -16,13 +20,21 @@ import numpy as np
 
 sys.stdout.reconfigure(encoding='utf-8')
 
+# Resolve project root so we can import model_registry regardless of cwd
+_SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, "..", ".."))
+_SERVER_NLP = os.path.join(_PROJECT_ROOT, "server-nlp")
+if _SERVER_NLP not in sys.path:
+    sys.path.insert(0, _SERVER_NLP)
+
+
 def main():
     print("=" * 60)
     print("KONKAN VANI — EMBEDDING BUILDER")
     print("=" * 60)
 
     # 1. Load the idioms CSV
-    csv_path = os.path.join("data", "processed", "idioms_with_phonetic_keys.csv")
+    csv_path = os.path.join(_PROJECT_ROOT, "data", "processed", "idioms_with_phonetic_keys.csv")
     print(f"\nLoading dataset: {csv_path}")
     df = pd.read_csv(csv_path)
     print(f"  Loaded {len(df)} rows")
@@ -37,10 +49,9 @@ def main():
     print(f"  Sample text [0]: '{texts[0]}'")
     print(f"  Total texts: {len(texts)}")
 
-    # 3. Load LaBSE model
-    print("\nLoading LaBSE model (sentence-transformers/LaBSE)...")
-    from sentence_transformers import SentenceTransformer
-    model = SentenceTransformer("sentence-transformers/LaBSE")
+    # 3. Load the same model the runtime server uses (custom → LaBSE fallback)
+    from app.core import model_registry
+    model = model_registry.get_model()
     print(f"  Model loaded. Embedding dimension: {model.get_sentence_embedding_dimension()}")
 
     # 4. Encode
@@ -54,8 +65,8 @@ def main():
     print(f"  Encoding complete.")
 
     # 5. Save to data/idiom_embeddings.npy
-    output_path = os.path.join("data", "idiom_embeddings.npy")
-    os.makedirs("data", exist_ok=True)
+    output_path = os.path.join(_PROJECT_ROOT, "data", "idiom_embeddings.npy")
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     np.save(output_path, embeddings)
 
     # 6. Report
@@ -69,3 +80,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

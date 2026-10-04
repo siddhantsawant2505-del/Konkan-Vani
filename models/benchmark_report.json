@@ -1,0 +1,31 @@
+{
+  "model_name": "konkan-vani-encoder-v1",
+  "base_model": "sentence-transformers/LaBSE",
+  "epochs": 3,
+  "batch_size": 16,
+  "training_time_seconds": 7571.61,
+  "train_pairs": 8320,
+  "test_samples": 1040,
+  "baseline_metrics": {
+    "mrr@10": 0.6275,
+    "mrr@5": 0.6173,
+    "recall@1": 0.5135,
+    "recall@5": 0.7875,
+    "recall@10": 0.8635,
+    "avg_pos_similarity": 0.4368
+  },
+  "finetuned_metrics": {
+    "mrr@10": 0.9984,
+    "mrr@5": 0.9984,
+    "recall@1": 0.9981,
+    "recall@5": 0.999,
+    "recall@10": 0.999,
+    "avg_pos_similarity": 0.9404
+  },
+  "improvements": {
+    "mrr@10_gain": "+59.1%",
+    "recall@1_gain": "+94.4%",
+    "recall@5_gain": "+26.9%",
+    "avg_similarity_gain": "+115.3%"
+  }
+}
