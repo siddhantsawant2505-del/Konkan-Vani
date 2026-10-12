@@ -1,0 +1,58 @@
+==============================================================================
+KONKAN VANI — FULL BENCHMARK RUN
+Started: 2026-10-12 11:14:48
+==============================================================================
+
+[1/6] DATASET STATISTICS
+Rows: 5200
+Columns: ['konkani_text', 'romanized_text', 'script', 'literal_meaning', 'figurative_meaning', 'english_meaning', 'marathi_meaning', 'example_sentence', 'category', 'cultural_context', 'phonetic_key', 'source']
+Provenance:
+  pattern_v1: 5095
+  curated: 105
+Categories: 15
+Field completeness (%):
+  konkani_text: 100.0%
+  romanized_text: 100.0%
+  literal_meaning: 100.0%
+  figurative_meaning: 100.0%
+  english_meaning: 100.0%
+  marathi_meaning: 100.0%
+  example_sentence: 100.0%
+  category: 100.0%
+  cultural_context: 100.0%
+  phonetic_key: 100.0%
+Romanized text word count: mean=4.96, median=5, max=6
+Embeddings: shape=(5200, 768), dtype=float32
+Embedding norms: min=1.0000, max=1.0000, mean=1.0000 (should be ~1.0 if L2-normalized)
+Search backend: FAISS index
+
+[2/6] LOADING MODEL
+Model loaded in 18.8s
+Device: cuda
+
+[3/6] RETRIEVAL ACCURACY (stage-wise, 200 sampled idioms per test)
+  fuzzy_exact         : acc=100.00%  mean_sim=1.0000
+  fuzzy_corrupt       : acc=100.00%  mean_sim=0.9870
+  semantic_exact      : acc=100.00%  mean_sim=0.9039
+  semantic_corrupt    : acc= 99.00%  mean_sim=0.8786
+
+[4/6] FULL PIPELINE EVALUATION (resolve_idiom)
+  OOD rejection rate: 100.0% (8/8)
+
+[5/6] LATENCY BENCHMARK
+  fuzzy           : mean=   2.94ms  p95=   5.06ms  p99=   6.55ms
+  semantic        : mean=  25.64ms  p95=  34.23ms  p99=  34.80ms
+  full_resolve    : mean=  35.28ms  p95=  46.98ms  p99=  49.29ms
+  search_topk10   : mean= 170.52ms  p95= 205.54ms  p99= 252.83ms
+
+[6/6] SEMANTIC THRESHOLD SWEEP (accuracy vs OOD rejection tradeoff)
+  In-domain max-cosine: mean=0.9053, min=0.8421
+  OOD max-cosine:       mean=0.4148, max=0.5134
+  th=0.50: in-domain acc=100.00%  OOD rej= 87.50%
+  th=0.55: in-domain acc=100.00%  OOD rej=100.00%
+  th=0.60: in-domain acc=100.00%  OOD rej=100.00%
+  th=0.63: in-domain acc=100.00%  OOD rej=100.00%
+  th=0.65: in-domain acc=100.00%  OOD rej=100.00%
+  th=0.70: in-domain acc=100.00%  OOD rej=100.00%
+  th=0.75: in-domain acc=100.00%  OOD rej=100.00%
+  th=0.80: in-domain acc=100.00%  OOD rej=100.00%

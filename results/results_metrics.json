@@ -1,0 +1,202 @@
+{
+  "timestamp": "2026-10-12 11:15:37",
+  "environment": {
+    "python": "3.12.5",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "device": "cuda"
+  },
+  "dataset": {
+    "total_rows": 5200,
+    "num_columns": 12,
+    "provenance": {
+      "pattern_v1": 5095,
+      "curated": 105
+    },
+    "num_categories": 15,
+    "category_distribution": {
+      "Wisdom & Life Lessons": 3058,
+      "Character & Integrity": 2062,
+      "Livelihood & Sea": 17,
+      "Speech & Manners": 13,
+      "Food & Kitchen": 10,
+      "Nature & Environment": 9,
+      "Peace & Resolution": 5,
+      "Family & Relationships": 5,
+      "Pride & Humility": 5,
+      "Education & Knowledge": 3,
+      "Spiritual": 3,
+      "Work & Business": 3
+    },
+    "field_completeness_pct": {
+      "konkani_text": 100.0,
+      "romanized_text": 100.0,
+      "literal_meaning": 100.0,
+      "figurative_meaning": 100.0,
+      "english_meaning": 100.0,
+      "marathi_meaning": 100.0,
+      "example_sentence": 100.0,
+      "category": 100.0,
+      "cultural_context": 100.0,
+      "phonetic_key": 100.0
+    },
+    "romanized_word_count": {
+      "mean": 4.96,
+      "median": 5.0,
+      "max": 6
+    },
+    "embedding_shape": [
+      5200,
+      768
+    ],
+    "embedding_norms": {
+      "min": 1.0,
+      "max": 1.0,
+      "mean": 1.0
+    },
+    "search_backend": "FAISS index"
+  },
+  "model": {
+    "loaded_in_s": 18.82,
+    "device": "cuda"
+  },
+  "retrieval_stage_accuracy": {
+    "fuzzy_exact": {
+      "accuracy": 100.0,
+      "hits": 200,
+      "total": 200,
+      "mean_similarity": 1.0,
+      "min_similarity": 1.0,
+      "max_similarity": 1.0
+    },
+    "fuzzy_corrupt": {
+      "accuracy": 100.0,
+      "hits": 200,
+      "total": 200,
+      "mean_similarity": 0.987,
+      "min_similarity": 0.9412,
+      "max_similarity": 1.0
+    },
+    "semantic_exact": {
+      "accuracy": 100.0,
+      "hits": 200,
+      "total": 200,
+      "mean_similarity": 0.9039,
+      "min_similarity": 0.7727,
+      "max_similarity": 0.959
+    },
+    "semantic_corrupt": {
+      "accuracy": 99.0,
+      "hits": 198,
+      "total": 200,
+      "mean_similarity": 0.8786,
+      "min_similarity": 0.6506,
+      "max_similarity": 0.9372
+    }
+  },
+  "pipeline_accuracy": {
+    "romanized_correct_pct": 100.0,
+    "devanagari_correct_pct": 100.0,
+    "romanized_match_types": {
+      "phonetic": 150
+    },
+    "devanagari_match_types": {
+      "phonetic": 150
+    },
+    "ood_total": 8,
+    "ood_true_neg": 8,
+    "ood_false_pos": 0,
+    "ood_rejection_pct": 100.0,
+    "ood_false_positive_details": []
+  },
+  "ood_rejection": {
+    "rate_pct": 100.0,
+    "false_positives": []
+  },
+  "latency_ms": {
+    "fuzzy": {
+      "mean_ms": 2.94,
+      "median_ms": 2.88,
+      "p95_ms": 5.06,
+      "p99_ms": 6.55,
+      "min_ms": 0.93,
+      "max_ms": 7.37,
+      "n": 60
+    },
+    "semantic": {
+      "mean_ms": 25.64,
+      "median_ms": 30.36,
+      "p95_ms": 34.23,
+      "p99_ms": 34.8,
+      "min_ms": 10.28,
+      "max_ms": 35.23,
+      "n": 60
+    },
+    "full_resolve": {
+      "mean_ms": 35.28,
+      "median_ms": 39.32,
+      "p95_ms": 46.98,
+      "p99_ms": 49.29,
+      "min_ms": 16.27,
+      "max_ms": 49.47,
+      "n": 60
+    },
+    "search_topk10": {
+      "mean_ms": 170.52,
+      "median_ms": 165.59,
+      "p95_ms": 205.54,
+      "p99_ms": 252.83,
+      "min_ms": 124.48,
+      "max_ms": 276.38,
+      "n": 60
+    }
+  },
+  "threshold_sweep": [
+    {
+      "threshold": 0.5,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 87.5
+    },
+    {
+      "threshold": 0.55,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    },
+    {
+      "threshold": 0.6,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    },
+    {
+      "threshold": 0.63,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    },
+    {
+      "threshold": 0.65,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    },
+    {
+      "threshold": 0.7,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    },
+    {
+      "threshold": 0.75,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    },
+    {
+      "threshold": 0.8,
+      "in_domain_accuracy_pct": 100.0,
+      "ood_rejection_pct": 100.0
+    }
+  ],
+  "similarity_distributions": {
+    "in_domain_mean": 0.9053,
+    "in_domain_min": 0.8421,
+    "in_domain_p5": 0.8605,
+    "ood_mean": 0.4148,
+    "ood_max": 0.5134
+  }
+}
