@@ -1,6 +1,7 @@
 """
 server-nlp/app/routers/resolve.py
-POST /api/resolve endpoint — takes {"text": str}, returns matched idiom or {"matched": false}.
+POST /api/resolve endpoint — takes {"text": str}, returns the matched idiom,
+or a provisional word-by-word reading for idioms outside the corpus.
 """
 
 import os
@@ -33,12 +34,25 @@ class ResolveResponse(BaseModel):
     matched: bool
     match_type: str | None = None
     confidence: float | None = None
+    # True when the answer was composed from word glosses rather than found
+    # in the corpus. The UI must show it as provisional.
+    provisional: bool | None = None
+    konkani_text: str | None = None
+    romanized_text: str | None = None
     literal_meaning: str | None = None
     figurative_meaning: str | None = None
     english_meaning: str | None = None
     marathi_meaning: str | None = None
     example_sentence: str | None = None
+    category: str | None = None
+    cultural_context: str | None = None
     word_analysis: list[WordMatch] | None = None
+    word_glosses: list[dict] | None = None
+    coverage: dict | None = None
+    themes: list[str] | None = None
+    negated: bool | None = None
+    closest_known: list[dict] | None = None
+    notes: list[str] | None = None
 
 
 @router.post("/resolve", response_model=ResolveResponse)

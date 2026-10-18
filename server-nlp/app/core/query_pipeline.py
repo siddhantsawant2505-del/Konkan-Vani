@@ -9,6 +9,10 @@ Two-stage matching pipeline:
                              (threshold 0.55)
   resolve_idiom():          tries Stage 1, falls back to Stage 2,
                              returns a structured result dict.
+
+A query that matches nothing in the corpus is no longer a dead end: the
+compositional stage glosses every word and composes a provisional meaning
+(app.core.compose), so the UI can always explain an unknown proverb.
 """
 
 import sys
@@ -27,7 +31,8 @@ if _SERVER_ROOT not in sys.path:
 from app.data_loader import store
 from app.core.phonetic_normalize import phonetic_normalize
 from app.core.dynamic_fallback import resolve_dynamic_fallback
-from app.core.word_analysis import resolve_words, analyze_words
+from app.core.word_analysis import analyze_words
+from app.core.compose import compose_idiom_meaning
 
 # ── Constants ──────────────────────────────────────────────────────────────
 FUZZY_THRESHOLD    = 75    # rapidfuzz token_sort_ratio (0–100)
@@ -35,6 +40,49 @@ FUZZY_THRESHOLD    = 75    # rapidfuzz token_sort_ratio (0–100)
 # up to 0.6086 against the pattern-frame corpus (false positives). Real
 # exact-copy hits score >= 0.7085, so 0.63 sits in the separation gap.
 SEMANTIC_THRESHOLD = 0.63  # cosine similarity (0–1, normalized vecs)
+
+# A proverb is a fixed string, so an embedding that is merely *topical* must not
+# be accepted as the same proverb. Measured on the pattern-frame corpus: the
+# unseen proverb "तांदूळ पोटांत शित कुशीत" scored 0.725 against
+# "भाताच्या पोळीत तूप" with ZERO shared content words, while real variants keep
+# nearly all of them. Semantic matches therefore also need lexical overlap.
+SEMANTIC_MIN_OVERLAP = 0.34
+
+# Words that carry no topical weight when measuring overlap.
+_OVERLAP_STOPWORDS = {
+    "mhanje", "mhanun", "ani", "na", "nahi", "nhay", "naka", "ek",
+    "आहे", "असता", "म्हणजे", "म्हणून", "आनी", "ना", "नाही", "न्हय", "नका", "एक",
+}
+
+
+def content_keys(text: str) -> set:
+    """Phonetic-normalised content words of a phrase (for overlap scoring)."""
+    import re as _re
+
+    keys = set()
+    for tok in _re.findall(r"[\u0900-\u097Fa-zA-Z]+", text or ""):
+        low = tok.lower()
+        if low in _OVERLAP_STOPWORDS:
+            continue
+        key = phonetic_normalize(tok)
+        if key and key not in _OVERLAP_STOPWORDS:
+            keys.add(key)
+    return keys
+
+
+def lexical_overlap(query: str, candidate: str) -> float:
+    """Share of the query's content words that also occur in the candidate.
+
+    Devanagari and romanised forms normalise to the same key where the phonetic
+    rules allow it (aa→a, v→w, zh→j, ee→i, oo→u), so a Devanagari query still
+    overlaps its romanised row.
+    """
+    q = content_keys(query)
+    if not q:
+        return 0.0
+    c = content_keys(candidate)
+    # index both scripts of the candidate when a row is passed in
+    return len(q & c) / len(q)
 
 # (LaBSE is loaded once via app.core.model_registry — shared with
 #  word_analysis so both encode with the same model instance.)
@@ -109,19 +157,31 @@ def semantic_match(text: str, store, threshold: float = SEMANTIC_THRESHOLD) -> d
     """
     query_emb = _encode([text])[0]  # shape (768,)
 
-    results = store.faiss_search(query_emb, top_k=1)
+    results = store.faiss_search(query_emb, top_k=3)
     if not results:
         return None
 
-    best_idx, best_score = results[0]
-
-    if best_score >= threshold:
+    for best_idx, best_score in results:
+        if best_score < threshold:
+            break
         row = store.get_row(best_idx)
-        return {
-            "row": row,
-            "score": best_score,
-            "idx": best_idx,
-        }
+        # Proverb identity, not just topic: require shared content words in
+        # either script of the candidate.
+        overlap = max(
+            lexical_overlap(text, row["konkani_text"]),
+            lexical_overlap(text, row["romanized_text"]),
+        )
+        if overlap >= SEMANTIC_MIN_OVERLAP:
+            return {
+                "row": row,
+                "score": best_score,
+                "idx": best_idx,
+                "overlap": round(overlap, 4),
+            }
+        logger.info(
+            "Semantic candidate rejected (topical only): %.4f -> %r overlap=%.2f",
+            best_score, row["konkani_text"], overlap,
+        )
 
     return None
 
@@ -132,10 +192,12 @@ def resolve_idiom(text: str, store) -> dict:
     Stage resolver:
       Stage 1 — Phonetic/Devanagari Fuzzy Match
       Stage 2 — Semantic Embedding Match (LaBSE + FAISS)
-      Stage 3 — Word-level Analysis (shared LaBSE, conservative gate)
-      Stage 4 — Dynamic AI Fallback (opt-in)
-    Returns a structured dict with matched/match_type/confidence + idiom fields,
-    or {"matched": False} if all fail. Every response carries word_analysis.
+      Stage 3 — Dynamic AI Fallback (opt-in, needs GEMINI_API_KEY)
+      Stage 4 — Compositional reading: gloss every word, compose a provisional
+                meaning for the unknown proverb (never returns "not found"
+                for text that contains at least one letter).
+    Returns a structured dict with matched/match_type/confidence + idiom fields.
+    Every response carries word_analysis.
     """
     result = None
 
@@ -170,14 +232,17 @@ def resolve_idiom(text: str, store) -> dict:
                 "example_sentence":   row["example_sentence"],
             }
 
-    # Stage 3: Word-level analysis (conservative — exact vocab hit + majority)
-    if result is None:
-        result = resolve_words(text)
-
-    # Stage 4: Dynamic AI Fallback (opt-in via DYNAMIC_FALLBACK_ENABLED=1)
+    # Stage 3: Dynamic AI Fallback (opt-in via DYNAMIC_FALLBACK_ENABLED=1)
     # Can fabricate answers for idioms not in the dataset — disabled by default.
     if result is None:
         result = resolve_dynamic_fallback(text)
+
+    # Stage 4: Compositional reading.
+    # Glosses each word from the word lexicon and composes a provisional
+    # meaning. This is what replaces the old "not found" screen: it is
+    # explicitly labelled provisional instead of pretending to be attested.
+    if result is None:
+        result = compose_idiom_meaning(text)
 
     # Attach word-level analysis to EVERY response for transparency
     try:
@@ -206,21 +271,20 @@ def search_idioms(query: str, top_k: int = 10) -> list[dict]:
     results = []
     seen_ids = set()
 
-    # 1. Exact or partial substring matching in Romanized or Devanagari text
-    for idx in range(store.count):
+    # 1. Exact or partial substring matching in Romanized or Devanagari text.
+    #    Scans flat column caches instead of calling get_row() per row — that
+    #    alone removed ~300 ms from a top-10 search.
+    for idx, matched_on in store.substring_hits(q_norm, q, limit=top_k):
         row = store.get_row(idx)
-        rom = row.get("romanized_text", "").lower()
-        konk = row.get("konkani_text", "")
-        if q_norm and (q_norm in rom or q in konk):
-            seen_ids.add(idx)
-            entry = dict(row)
-            entry["id"] = str(idx)
-            entry["match_type"] = "exact" if (q_norm == rom or q == konk) else "phonetic"
-            entry["confidence"] = 1.0 if entry["match_type"] == "exact" else 0.95
-            entry["matched_on"] = "romanized_text" if q_norm in rom else "konkani_text"
-            results.append(entry)
-            if len(results) >= top_k:
-                break
+        rom = store._roman_lower[idx]
+        konk = store._konkani_raw[idx]
+        seen_ids.add(idx)
+        entry = dict(row)
+        entry["id"] = str(idx)
+        entry["match_type"] = "exact" if (q_norm == rom or q == konk) else "phonetic"
+        entry["confidence"] = 1.0 if entry["match_type"] == "exact" else 0.95
+        entry["matched_on"] = matched_on
+        results.append(entry)
 
     # 2. Phonetic / String Fuzzy Matching via rapidfuzz
     import re
@@ -271,11 +335,21 @@ def search_idioms(query: str, top_k: int = 10) -> list[dict]:
     # 3. Semantic Search using LaBSE embedding + FAISS (or brute-force)
     try:
         query_emb = _encode([q])[0]
-        sem_matches = store.faiss_search(query_emb, top_k=top_k)
+        sem_matches = store.faiss_search(query_emb, top_k=top_k * 3)
         for idx, sim in sem_matches:
-            if sim >= SEMANTIC_THRESHOLD and idx not in seen_ids:
+            if sim < SEMANTIC_THRESHOLD or idx in seen_ids:
+                continue
+            row = store.get_row(idx)
+            # Same overlap guard as semantic_match(): a topically related but
+            # different proverb must not be surfaced as this query's match.
+            overlap = max(
+                lexical_overlap(q, row["konkani_text"]),
+                lexical_overlap(q, row["romanized_text"]),
+            )
+            if overlap < SEMANTIC_MIN_OVERLAP:
+                continue
+            if len(results) < top_k:
                 seen_ids.add(idx)
-                row = store.get_row(idx)
                 entry = dict(row)
                 entry["id"] = str(idx)
                 entry["match_type"] = "semantic"

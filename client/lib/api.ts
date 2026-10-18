@@ -4,7 +4,12 @@
 // Schema: Devanagari Konkani input → Marathi meaning + English meaning + figurative/literal
 // ──────────────────────────────────────────────────────────────────────────────
 
-import type { SearchResponse, BrowseResponse, Idiom } from "./types";
+import type {
+  SearchResponse,
+  BrowseResponse,
+  Idiom,
+  ProvisionalReading,
+} from "./types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -100,6 +105,7 @@ export async function searchIdioms(query: string): Promise<SearchResponse> {
         matched_on: string;
       }>;
       total: number;
+      provisional?: ProvisionalReading | null;
     }>(`/api/search?q=${encodeURIComponent(query)}`);
 
     return {
@@ -111,6 +117,7 @@ export async function searchIdioms(query: string): Promise<SearchResponse> {
         matched_on: r.matched_on,
       })),
       total: data.total,
+      provisional: data.provisional ?? null,
     };
   } catch (e) {
     console.warn("Backend unavailable, falling back to local placeholder data:", e);

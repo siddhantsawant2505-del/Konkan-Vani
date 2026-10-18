@@ -1,0 +1,92 @@
+{
+  "lexicon_entries": 376,
+  "embedding_threshold": 0.7,
+  "corpus_vocabulary": 763,
+  "lookup_methods": {
+    "exact": 628,
+    "none": 99,
+    "suffix": 12,
+    "fuzzy": 9,
+    "embedding": 15
+  },
+  "vocabulary_glossed_pct": 87.02,
+  "idiom_coverage": {
+    "mean": 0.9969,
+    "median": 1.0,
+    "fully_glossed": 5160,
+    "idioms": 5200
+  },
+  "examples": [
+    {
+      "query": "हात मुंडो धुवून घेवप",
+      "roman": "Haat mudo dhuvun ghevap",
+      "in_corpus": false,
+      "match_type": "compositional",
+      "confidence": 0.72,
+      "coverage": {
+        "glossed": 3,
+        "total": 3,
+        "ratio": 1.0
+      },
+      "literal": "hand · head · wash (for oneself)",
+      "reading": "Provisional reading (3/3 words recognised): to wash (for oneself) one's own hand and head — a saying about the body and what a person does with or to it.",
+      "themes": [
+        "body",
+        "motion"
+      ]
+    },
+    {
+      "query": "तांदूळ पोटांत शित कुशीत",
+      "roman": "Tandul potant shit kushit",
+      "in_corpus": false,
+      "match_type": "compositional",
+      "confidence": 0.72,
+      "coverage": {
+        "glossed": 4,
+        "total": 4,
+        "ratio": 1.0
+      },
+      "literal": "rice grain · in the stomach · cooked rice · in the lap",
+      "reading": "Provisional reading (4/4 words recognised): a phrase naming rice grain, stomach, cooked rice and lap — a saying about food, sustenance and what is shared or kept back.",
+      "themes": [
+        "food",
+        "body"
+      ]
+    },
+    {
+      "query": "घराचेर पाऊस पडटा आनी आंगण सुकें",
+      "roman": "Ghoracher paus paddta aani angan sukem",
+      "in_corpus": false,
+      "match_type": "compositional",
+      "confidence": 0.3875,
+      "coverage": {
+        "glossed": 3,
+        "total": 6,
+        "ratio": 0.5
+      },
+      "literal": "on the house · rain · [पडटा] · and · [आंगण] · [सुकें]",
+      "reading": "Provisional reading (3/6 words recognised): a phrase naming house and rain — a saying about home, village and the shared spaces of daily life (the input reads like an ordinary sentence, not a proverb).",
+      "themes": [
+        "place"
+      ]
+    },
+    {
+      "query": "दोनूय हातांनी तूप पोटांत",
+      "roman": "Donui haatanni tup potant",
+      "in_corpus": false,
+      "match_type": "compositional",
+      "confidence": 0.72,
+      "coverage": {
+        "glossed": 4,
+        "total": 4,
+        "ratio": 1.0
+      },
+      "literal": "both · hand · ghee · in the stomach",
+      "reading": "Provisional reading (4/4 words recognised): a phrase naming hand, ghee and stomach — a saying about the body and what a person does with or to it.",
+      "themes": [
+        "body",
+        "place"
+      ]
+    }
+  ]
+}

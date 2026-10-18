@@ -1,6 +1,6 @@
 ==============================================================================
 KONKAN VANI — FULL BENCHMARK RUN
-Started: 2026-10-12 11:14:48
+Started: 2026-10-18 02:08:22
 ==============================================================================
 
 [1/6] DATASET STATISTICS
@@ -27,7 +27,7 @@ Embedding norms: min=1.0000, max=1.0000, mean=1.0000 (should be ~1.0 if L2-norma
 Search backend: FAISS index
 
 [2/6] LOADING MODEL
-Model loaded in 18.8s
+Model loaded in 27.9s
 Device: cuda
 
 [3/6] RETRIEVAL ACCURACY (stage-wise, 200 sampled idioms per test)
@@ -37,13 +37,22 @@ Device: cuda
   semantic_corrupt    : acc= 99.00%  mean_sim=0.8786
 
 [4/6] FULL PIPELINE EVALUATION (resolve_idiom)
-  OOD rejection rate: 100.0% (8/8)
+  OOD corpus-claim rejection: 100.0% (8/8)
+  OOD answered by provisional reading: 100.0%
+    provisional: 'what is the capital of France?' conf=0.0833 coverage={'glossed': 1, 'total': 6, 'ratio': 0.1667} → 'path · [is] · [the] · [capital] · [of] · [France]'
+    provisional: 'recipe for chocolate cake with eggs' conf=0.0 coverage={'glossed': 0, 'total': 6, 'ratio': 0.0} → '[recipe] · [for] · [chocolate] · [cake] · [with] · [eggs]'
+    provisional: 'Melbourne Cricketers narrowly won the match' conf=0.0 coverage={'glossed': 0, 'total': 6, 'ratio': 0.0} → '[Melbourne] · [Cricketers] · [narrowly] · [won] · [the] · [match]'
+    provisional: 'पाठशाळेत आज मोठी चाचणी घेतली' conf=0.2628 coverage={'glossed': 2, 'total': 5, 'ratio': 0.4} → '[पाठशाळेत] · [आज] · ≈big · [चाचणी] · took (f.)'
+    provisional: 'Stock markets fell sharply after the announcement' conf=0.0 coverage={'glossed': 0, 'total': 7, 'ratio': 0.0} → '[Stock] · [markets] · [fell] · [sharply] · [after] · [the] · [announcement]'
+    provisional: 'amchi mumbai local train chhan chhan dhotey' conf=0.0 coverage={'glossed': 0, 'total': 6, 'ratio': 0.0} → '[amchi] · [mumbai] · [local] · [train] · [chhan] · [dhotey]'
+    provisional: 'quantum physics describes subatomic particles' conf=0.0 coverage={'glossed': 0, 'total': 5, 'ratio': 0.0} → '[quantum] · [physics] · [describes] · [subatomic] · [particles]'
+    provisional: 'the mitochondria is the powerhouse of the cell' conf=0.0 coverage={'glossed': 0, 'total': 8, 'ratio': 0.0} → '[the] · [mitochondria] · [is] · [the] · [powerhouse] · [of] · [the] · [cell]'
 
 [5/6] LATENCY BENCHMARK
-  fuzzy           : mean=   2.94ms  p95=   5.06ms  p99=   6.55ms
-  semantic        : mean=  25.64ms  p95=  34.23ms  p99=  34.80ms
-  full_resolve    : mean=  35.28ms  p95=  46.98ms  p99=  49.29ms
-  search_topk10   : mean= 170.52ms  p95= 205.54ms  p99= 252.83ms
+  fuzzy           : mean=   5.43ms  p95=   8.38ms  p99=   8.69ms
+  semantic        : mean=  25.67ms  p95=  30.73ms  p99=  32.42ms
+  full_resolve    : mean=  33.89ms  p95=  41.30ms  p99=  43.22ms
+  search_topk10   : mean=  38.08ms  p95=  44.95ms  p99=  51.07ms
 
 [6/6] SEMANTIC THRESHOLD SWEEP (accuracy vs OOD rejection tradeoff)
   In-domain max-cosine: mean=0.9053, min=0.8421

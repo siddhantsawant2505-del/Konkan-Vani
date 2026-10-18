@@ -192,7 +192,7 @@ Kshitij Sharma
 \begin{justify}
 Konkan Vani is a web-based natural language processing (NLP) system that helps users retrieve the meanings of Konkani idioms and proverbs. Konkani is written in several scripts and is often typed informally, so the same idiom appears in many spellings, and users frequently remember only what an idiom means rather than how it is written. The system accepts queries in Devanagari, Kannada-script, Romanized Konkani, and English or Marathi descriptions of a meaning.
 
-A Next.js web client communicates with a Python FastAPI service that resolves each query through a staged pipeline: phonetic normalization with RapidFuzz fuzzy matching, multilingual semantic retrieval using a LaBSE-based encoder fine-tuned on Konkani idiom data (konkan-vani-encoder-v1), and a FAISS vector index, followed by a fallback response for queries that do not meet the confidence thresholds. For each retrieved idiom the interface presents the literal meaning, figurative meaning, English and Marathi meanings, and an example sentence.
+A Next.js web client communicates with a Python FastAPI service that resolves each query through a staged pipeline: phonetic normalization with RapidFuzz fuzzy matching, multilingual semantic retrieval using a LaBSE-based encoder fine-tuned on Konkani idiom data (konkan-vani-encoder-v1), and a FAISS vector index, followed by a compositional fallback that glosses the query word by word and composes a provisional meaning when no stored idiom qualifies. For each retrieved idiom the interface presents the literal meaning, figurative meaning, English and Marathi meanings, and an example sentence.
 
 The system is built on a dataset of 5,200 idiom records, each encoded as a 768-dimensional embedding. Fine-tuning the encoder with MultipleNegativesRankingLoss on 8,320 in-domain pairs raised held-out retrieval performance from a LaBSE Recall@1 of 51.4\% to 99.8\% (MRR@10 from 62.8\% to 99.8\%). In an automated benchmark on the live system, 200 sampled in-domain queries were retrieved with 100\% top-1 accuracy despite corrupted spellings, 150 Romanized and 150 Devanagari full-pipeline queries were each resolved correctly in 100\% of cases, and eight unrelated out-of-domain queries were all rejected with no false positives. Fuzzy matching takes about 3\,ms and full query resolution about 35\,ms (95th percentile 47\,ms) on a CUDA machine. The project shows that combining lexical and semantic retrieval with a domain fine-tuned encoder is an effective way to make Konkani idiomatic knowledge searchable across scripts and spelling conventions.
 \end{justify}
@@ -261,7 +261,7 @@ Konkani is written in several scripts and typed informally, so the same idiom ap
 The system covers idioms and proverbs that are present in its dataset. It supports three input scripts and two description languages, provides browsing and search through a web interface, and exposes its functions through a REST API. It is a retrieval system: it finds and presents stored meanings and does not generate new translations of arbitrary Konkani text. Its coverage is bounded by the dataset, so it should not be treated as a complete Konkani dictionary or as covering every regional dialect.
 
 \subsection{Organization of the Report}
-Section~2 describes the methodology, including preprocessing, the staged resolution algorithm, and the flowcharts. Section~3 lists the tools and software used. Section~4 describes the dataset and its provenance. Section~5 presents the implementation with code snapshots. Section~6 reports the measured results --- accuracy, fine-tuning gain, out-of-domain rejection, threshold sensitivity, and latency --- with charts, as well as the limitations. Section~7 concludes the report and suggests improvements, and the references follow.
+Section~2 describes the methodology, including preprocessing, the staged resolution algorithm, and the flowcharts. Section~3 lists the tools and software used. Section~4 describes the dataset and its provenance. Section~5 presents the implementation with code snapshots. Section~6 reports the measured results --- accuracy, fine-tuning gain, false-positive behaviour, threshold sensitivity, latency, and the coverage of the word-by-word fallback --- with charts, as well as the limitations. Section~7 concludes the report and suggests improvements, and the references follow.
 % =====================================================
 % c) METHODOLOGY
 % =====================================================
@@ -283,7 +283,7 @@ The generic LaBSE model was fine-tuned on the idiom corpus itself, producing the
 
 \subsection{Models and Algorithms}
 
-\textbf{Staged Resolution.} Each query passes through a staged resolver. Stage~1 is phonetic fuzzy matching. If no candidate meets the threshold, Stage~2 performs semantic vector search with the fine-tuned encoder. If that also fails, a word-level analysis stage acts as a conservative third attempt, and queries that satisfy none of the thresholds receive a fallback response. The cheap stage runs first, so most surface-variant queries never need the more expensive semantic stage.
+\textbf{Staged Resolution.} Each query passes through a staged resolver. Stage~1 is phonetic fuzzy matching. If no candidate meets the threshold, Stage~2 performs semantic vector search with the fine-tuned encoder, accepting a candidate only when it also shares content words with the query (so that a merely topical neighbour is not mistaken for the same proverb). If that also fails, Stage~3 --- a compositional fallback --- glosses every word of the query from a Konkani word lexicon and composes a provisional meaning, so an unknown proverb is still explained rather than answered with an empty screen. The cheap stage runs first, so most surface-variant queries never need the more expensive semantic stage, and the neural stage never runs for words the glossary already knows.
 
 \textbf{Stage 1: Phonetic Fuzzy Matching.} The normalized query is compared with stored phonetic keys and text variants using the RapidFuzz token sort ratio. This measure sorts the words of both strings alphabetically before computing a character-level similarity score between 0 and 100, so a different word order does not reduce the score. A candidate is accepted when its score reaches the cutoff:
 \[
@@ -747,7 +747,7 @@ The full resolver was tested on 150 Romanized and 150 Devanagari queries (seeded
 
 \begin{table}[H]
 \centering
-\caption{End-to-End Pipeline Accuracy and Out-of-Domain Rejection (real run)}
+\caption{End-to-End Pipeline Accuracy and Out-of-Domain Behaviour (real run). A false positive means a non-dataset input was reported as a known proverb.}
 \label{tab:pipeline}
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{|l|c|}
@@ -758,9 +758,11 @@ Romanized query accuracy (150 queries) & 100.0\% \\
 \hline
 Devanagari query accuracy (150 queries) & 100.0\% \\
 \hline
-Out-of-domain queries correctly rejected (8 queries) & 8 / 8 (100\%) \\
+Out-of-domain inputs \emph{not} claimed as a known proverb (8 queries) & 8 / 8 (100\%) \\
 \hline
-False positives on out-of-domain queries & 0 \\
+Out-of-domain false positives & 0 \\
+\hline
+Out-of-domain inputs answered provisionally (word by word) & 8 / 8 (100\%) \\
 \hline
 \end{tabular}
 \end{table}
@@ -807,7 +809,7 @@ The semantic threshold is chosen inside a measured separation gap: over the benc
 \end{figure}
 
 \subsection{Latency}
-Table~\ref{tab:latency} reports measured latencies per operation (warm model, 60 queries per operation). Fuzzy matching is consistently sub-3\,ms; semantic search is dominated by encoder inference; the full resolver completes in about 35\,ms on average. Figure~\ref{fig:latency} and Figure~\ref{fig:latency_cdf} show the percentile bars and the cumulative distribution. % CHARTS: results/fig_latency.png, results/fig_latency_cdf.png
+Table~\ref{tab:latency} reports measured latencies per operation (warm model, 60 queries per operation). Fuzzy matching stays under 10\,ms at the 95th percentile; semantic search is dominated by encoder inference; the full resolver completes in about 34\,ms on average. The multi-result search path originally scanned all 5,200 rows through a per-row pandas accessor (about 350\,ms); replacing that scan with cached column lists and adding an overlap gate brought it to 38\,ms. Figure~\ref{fig:latency} and Figure~\ref{fig:latency_cdf} show the percentile bars and the cumulative distribution. % CHARTS: results/fig_latency.png, results/fig_latency_cdf.png
 
 \begin{table}[H]
 \centering
@@ -818,13 +820,13 @@ Table~\ref{tab:latency} reports measured latencies per operation (warm model, 60
 \hline
 \textbf{Operation} & \textbf{Mean} & \textbf{Median} & \textbf{p95} & \textbf{p99} \\
 \hline
-Phonetic fuzzy match & 2.94 & 2.88 & 5.06 & 6.55 \\
+Phonetic fuzzy match & 5.43 & 5.80 & 8.38 & 8.69 \\
 \hline
-Semantic match (encoder + search) & 25.64 & 30.36 & 34.23 & 34.80 \\
+Semantic match (encoder + search) & 25.67 & 25.56 & 30.73 & 32.42 \\
 \hline
-Full resolve\_idiom() & 35.28 & 39.32 & 46.98 & 49.29 \\
+Full resolve\_idiom() & 33.89 & 35.23 & 41.30 & 43.22 \\
 \hline
-Multi-result search (top-10) & 170.52 & 165.59 & 205.54 & 252.83 \\
+Multi-result search (top-10) & 38.08 & 37.98 & 44.95 & 51.07 \\
 \hline
 \end{tabular}
 \end{table}
@@ -852,6 +854,29 @@ Figure~\ref{fig:stage_funnel} shows which resolver stage claims each query: the 
 \caption{Resolver stage attribution across 200 queries}
 \label{fig:stage_funnel}
 \end{figure}
+
+\subsection{Provisional Word-by-Word Fallback for Unknown Proverbs}
+The corpus resolves only what it contains. Any proverb that is absent --- a rare village saying, a dialect variant, a proverb typed in an unusual transliteration --- previously produced an empty result screen, and on a few inputs it produced a \emph{wrong} answer: the encoder scored a topically related proverb high enough to pass the 0.63 threshold. For example, the unattested phrase \textit{tandul potant shit kushit} (`rice grain in the stomach, cooked rice in the lap') scored 0.725 against \textit{bhatachya polit tup} (`ghee in the rice flatbread') despite sharing \emph{no} content words, because both are about rice.
+
+Two changes address this. First, the semantic stage now requires lexical overlap with the candidate: at least 34\% of the query's phonetic-normalised content words must occur in the candidate's Devanagari or Romanised form. A proverb is a fixed string, so paraphrase-level overlap is the right identity test; purely topical similarity is no longer accepted. Second, a compositional fallback replaces the empty screen. A word glossary (376 entries, built by \texttt{src/build\_lexicon.py} from the pattern bank's own trilingual glosses plus a curated table) is consulted for every word of the query in five layers: exact headword, inflected stem (case and verb endings are stripped), phonetic key, romanised spelling variant, and --- for Devanagari only --- an approximate cross-lingual gloss obtained by matching the word's LaBSE vector against the English glosses in the glossary. The glosses are then composed into a reading: the literal word sequence, the action word (with Konkani perfective compounds such as \textit{dhuvun ghevap}, `wash for oneself', merged into a single action), the imagery theme inferred from semantic tags, negation and reduplication cues, and an explicit statement of how many words were recognised. Every composed answer is labelled provisional, unknown words are left untranslated rather than guessed, and the nearest corpus entries are shown separately as comparisons.
+
+Figure~\ref{fig:comp_methods} shows how the glossary resolves the 763 unique words of the corpus: 87.0\% are glossed (628 exact, 12 by stem, 9 by spelling variant, 15 approximately), and 99.7\% of the 5,200 idioms have every word glossed (Figure~\ref{fig:comp_coverage}). On the approximate layer, calibration over the glossary's own headwords gives Recall@1 of 0.41 and, at the shipped 0.70 threshold, 86.6\% precision at 35.3\% coverage; romanised input performs far worse (Recall@1 0.05), which is why that layer is restricted to Devanagari. Table~\ref{tab:composition-examples} lists composed readings for proverbs that the pipeline verified are absent from the corpus.
+
+\begin{figure}[H]
+\centering
+\safefig{fig_composition_methods.png}{width=0.85\linewidth}
+\caption{How the 763 unique corpus words are glossed by the word lexicon (measured). Note the log-like imbalance: most words are exact headwords, with the approximation layer covering the tail.}
+\label{fig:comp_methods}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\safefig{fig_composition_coverage.png}{width=0.85\linewidth}
+\caption{Distribution of per-idiom glossary coverage over the 5,200-entry corpus (mean 0.997)}
+\label{fig:comp_coverage}
+\end{figure}
+
+\input{results/tables_composition.tex}
 
 \subsection{Dataset Diagnostic Charts}
 Figure~\ref{fig:dataset_charts} shows the dataset provenance split and the largest categories; Figure~\ref{fig:qq_threshold} confirms worst-case coverage: the best-cosine score of every sampled in-domain query, sorted, clears the threshold. Figure~\ref{fig:heatmap} shows a slice of the real embedding matrix; Figure~\ref{fig:richness} compares the average field length of curated entries with the pattern-generated ones. % CHARTS: results/fig_dataset.png, fig_qq_threshold.png, fig_embedding_heatmap.png, fig_field_richness.png
@@ -885,7 +910,7 @@ Figure~\ref{fig:dataset_charts} shows the dataset provenance split and the large
 \end{figure}
 
 \subsection{Discussion}
-The measured results support the design claims. Fine-tuning the encoder on in-domain pairs is the single largest contributor to semantic accuracy (Recall@1 from 51.4\% to 99.8\%); fuzzy matching with phonetic normalization absorbs user spelling errors entirely at this scale (100\% even on corrupted queries); the pipelines' thresholds sit inside a measured separation gap, so unrelated queries are rejected rather than mistaken for idioms (zero false positives); and the response time of the full resolver (about 35\,ms mean) is fast enough for an interactive interface. The multi-result browse/search path is noticeably heavier (about 170\,ms) because it encodes the query once but scores and merges ranked lists; it is used for browsing, not for keystroke-level search.
+The measured results support the design claims. Fine-tuning the encoder on in-domain pairs is the single largest contributor to semantic accuracy (Recall@1 from 51.4\% to 99.8\%); fuzzy matching with phonetic normalization absorbs user spelling errors entirely at this scale (100\% even on corrupted queries); the pipelines' thresholds sit inside a measured separation gap, so unrelated queries are never claimed as known proverbs (zero false positives over the eight negatives, each of which instead receives a provisional reading); and the response time of the full resolver (about 34\,ms mean) is fast enough for an interactive interface. The multi-result browse/search path encodes the query once and then merges ranked lists; caching the substring index brought it from roughly 350\,ms to 38\,ms, so it too is interactive.
 
 \subsection{Limitations}
 \begin{itemize}
@@ -894,6 +919,8 @@ The measured results support the design claims. Fine-tuning the encoder on in-do
   \item \textbf{Benchmark scale:} accuracy was measured on 200--300 sampled entries per configuration; a fluent-speaker annotated benchmark is future work.
   \item \textbf{Threshold sensitivity:} the 75 and 0.63 thresholds trade recall against precision and may need retuning as the dataset grows.
   \item \textbf{Transliteration ambiguity:} unusual transliterations and dialect variants can still be missed by the phonetic stage.
+  \item \textbf{Glossary size and precision:} the word lexicon holds 376 entries, so a proverb built from unlisted words is only partly explained; the approximate cross-lingual layer is 86.6\% precise at the shipped threshold and is always marked with ``$\approx$''. Composed readings are provisional by construction and are not attested meanings.
+  \item \textbf{Provisional answers are not rejection:} because every non-empty input now receives a reading, the old ``matched: false'' signal no longer exists; the benchmark therefore measures false positives as \emph{claims that an unknown input is a known proverb}, which is zero.
   \item \textbf{Hardware dependence:} absolute latency figures were measured on one CUDA machine and vary with hardware; accuracy figures do not.
 \end{itemize}
 % =====================================================
@@ -902,7 +929,7 @@ The measured results support the design claims. Fine-tuning the encoder on in-do
 \section{Conclusion}
 
 \subsection{Summary}
-The Konkan Vani mini project demonstrates how NLP techniques can make Konkani idioms and proverbs searchable across scripts and spelling conventions. The system combines Unicode and phonetic normalization, RapidFuzz fuzzy matching, a LaBSE-family encoder fine-tuned on the idiom corpus, FAISS vector search, and threshold-based rejection behind a Next.js web interface and FastAPI NLP service. On measured benchmarks, the fine-tuned encoder raised held-out Recall@1 from 51.4\% to 99.8\%; sampled in-domain queries were retrieved with 100\% top-1 accuracy even with corrupted spellings; out-of-domain queries were all rejected with zero false positives; and a full query resolves in about 35\,ms on average. The project shows the value of a hybrid lexical--semantic retrieval design --- and of measuring it --- for a low-resource language.
+The Konkan Vani mini project demonstrates how NLP techniques can make Konkani idioms and proverbs searchable across scripts and spelling conventions. The system combines Unicode and phonetic normalization, RapidFuzz fuzzy matching, a LaBSE-family encoder fine-tuned on the idiom corpus, FAISS vector search, and threshold-based rejection behind a Next.js web interface and FastAPI NLP service. On measured benchmarks, the fine-tuned encoder raised held-out Recall@1 from 51.4\% to 99.8\%; sampled in-domain queries were retrieved with 100\% top-1 accuracy even with corrupted spellings; out-of-domain queries were all answered without being claimed as known proverbs (zero false positives); a full query resolves in about 34\,ms on average; and a proverb outside the corpus is still explained word by word, with the provisional nature of that reading stated explicitly. The project shows the value of a hybrid lexical--semantic retrieval design --- and of measuring it --- for a low-resource language.
 
 \subsection{Learning Outcomes}
 Through this project the team gained practical experience in preparing a multilingual text dataset with recorded provenance, handling Indic scripts and transliteration, fine-tuning a pretrained sentence-embedding model with contrastive loss, building and querying a vector index, choosing thresholds from measured score distributions rather than intuition, benchmarking accuracy and latency reproducibly, and combining a Python NLP service with a web front end.

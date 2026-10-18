@@ -1,5 +1,5 @@
 % ======================================================================
-% Konkan Vani — Chapter 5 replacement: "Testing and Results"
+% Konkan Vani --- Chapter 5 replacement: "Testing and Results"
 % This file holds all REAL measured results. Every table/figure stores
 % numbers produced by src/run_full_benchmark.py on the live pipeline and
 % src/make_results_assets.py for the charts. All values were produced
@@ -278,6 +278,59 @@ behavior.
     \label{fig:field-richness}
 \end{figure}
 
+\section{Provisional Word-by-Word Fallback}
+\label{sec:compositional}
+A proverb the corpus does not contain used to end at an empty result
+screen, and on a few inputs it produced a \emph{wrong} answer because the
+encoder scored a topically related proverb above the 0.63 threshold. Two
+changes fixed both behaviours.
+
+First, the semantic stage now demands lexical identity as well as
+similarity: at least 34\% of the query's phonetic-normalised content words
+must occur in the candidate, in either script. Proverbs are fixed strings,
+so paraphrase-level overlap is the correct identity test.
+
+Second, unknown proverbs are answered by a compositional stage
+(\texttt{app/core/compose.py}) that glosses every word from a 376-entry
+Konkani word glossary (\texttt{data/lexicon/konkani\_lexicon.csv}, built by
+\texttt{src/build\_lexicon.py}) through a five-layer lookup: exact
+headword, inflected stem, phonetic key, romanised spelling variant, and an
+approximate cross-lingual gloss for Devanagari words the glossary does not
+list. The glosses are composed into a reading \--- literal word sequence,
+action word (with Konkani perfective compounds merged), imagery theme,
+negation and reduplication cues \--- and the answer is explicitly labelled
+provisional. Words that cannot be resolved are reported as unrecognised
+rather than guessed.
+
+Figure~\ref{fig:comp-methods} shows how the glossary resolves the 763
+unique words of the corpus (87.0\% glossed: 628 exact, 12 by stem, 9 by
+spelling variant, 15 approximately), and Figure~\ref{fig:comp-coverage}
+shows the per-idiom coverage distribution (mean 0.997).
+\texttt{src/calibrate\_lexicon.py} measures the approximate layer against
+the glossary's own headwords: Recall@1 0.41 and, at the shipped 0.70
+threshold, 86.6\% precision at 35.3\% coverage; the same layer on romanised
+input is far worse (Recall@1 0.05), which is why it is restricted to
+Devanagari.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\textwidth]{results/fig_composition_methods.png}
+    \caption{How the 763 unique corpus words are glossed by the word
+    lexicon. Most are exact headwords; the approximation layer covers part
+    of the tail, and 99 words remain unrecognised.}
+    \label{fig:comp-methods}
+\end{figure}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.85\textwidth]{results/fig_composition_coverage.png}
+    \caption{Distribution of per-idiom glossary coverage across the
+    5{,}200-entry corpus (mean 0.997, 5{,}160 idioms fully glossed).}
+    \label{fig:comp-coverage}
+\end{figure}
+
+\input{results/tables_composition.tex}
+
 \section{Limitations}
 These results are measured on the actual pipeline with real queries, but
 they must be read together with data provenance. Only 105 of 5{,}200
@@ -286,6 +339,12 @@ the remaining 98\% are transparently labeled pattern-generated proverb
 frames (\texttt{pattern\_v1}) built to give the synthetic vocabulary and
 semantic space coverage. High retrieval accuracy therefore partly
 reflects the low internal diversity of the pattern-generated subspace.
-Likewise the 100\% OOD rejection is measured on 8 handcrafted negatives.
+Likewise the OOD measurement uses 8 handcrafted negatives, and the word
+glossary is a hand-curated 376-entry resource whose approximate layer is
+86.6\% precise at the shipped threshold; composed readings are provisional
+by construction and are not attested meanings. Because every non-empty
+input now receives a reading, the benchmark measures false positives as
+\emph{claims that an unknown input is a known proverb} (zero here) rather
+than as ``matched: false''.
 A broader, human-validated evaluation with real user queries, a larger
 negative set, and a fluent-speaker benchmark remains future work.

@@ -43,7 +43,7 @@ The system uses a layered pipeline rather than a single monolithic matching algo
 
 - First, it tries fast approximate matching based on phonetic and script normalization.
 - Then it falls back to semantic similarity using embeddings and FAISS.
-- Finally, it applies conservative word-level analysis and optional fallback logic.
+- Finally, if no stored proverb is identified, it composes a provisional meaning word by word from a Konkani word glossary (an optional LLM fallback exists but is disabled by default).
 
 This division reduces latency and keeps the search engine robust across noisy, misspelled, transliterated, and semantically phrased queries.
 
@@ -100,9 +100,13 @@ This is the most important design component in the system. It functions as the i
 The resolver pipeline works in stages:
 
 1. Phonetic / fuzzy matching
-2. Semantic vector matching
-3. Word-level analysis
-4. Optional dynamic fallback
+2. Semantic vector matching (cosine >= 0.63 **and** lexical overlap >= 34% with the candidate, so a merely topical neighbour is rejected)
+3. Compositional word-by-word fallback (`app/core/compose.py` + `app/core/lexicon.py`): glosses each word from `data/lexicon/konkani_lexicon.csv` and composes a provisional meaning, so an unknown proverb is explained instead of returning "not found"
+4. Optional dynamic fallback (opt-in; off by default)
+
+Stages 2--3 decide *identity*, not just topic: proverbs are fixed strings, so a
+candidate must share content words with the query. Anything that fails that test
+is answered by stage 3 and explicitly labelled provisional in the UI.
 
 This multi-stage design is a practical system architecture choice because real-world user input is noisy and inconsistent. A single exact-match strategy would fail for Romanized spelling errors, small transliteration differences, and semantic paraphrasing.
 

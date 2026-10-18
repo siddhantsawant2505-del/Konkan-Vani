@@ -327,27 +327,48 @@ neg_queries = [
     "the mitochondria is the powerhouse of the cell",
 ]
 
-ood_results = {"true_neg": 0, "false_pos": 0, "total": len(neg_queries),
-               "matched_to": []}
+# A negative is only a FALSE POSITIVE if the system claims it is a known
+# proverb (a corpus match). With the compositional fallback in place, an
+# unknown input now always gets a *provisional* reading instead of an empty
+# screen — that is the intended behaviour, not a false positive.
+CORPUS_CLAIM_TYPES = {"phonetic", "semantic", "exact"}
+
+ood_results = {"true_neg": 0, "false_pos": 0, "provisional": 0,
+                "total": len(neg_queries), "matched_to": [],
+                "provisional_details": []}
 for q in neg_queries:
     r = resolve_idiom(q, store)
-    if r.get("matched"):
+    mtype = r.get("match_type")
+    if mtype in CORPUS_CLAIM_TYPES:
         ood_results["false_pos"] += 1
         ood_results["matched_to"].append({
             "query": q[:50],
-            "match_type": r.get("match_type"),
+            "match_type": mtype,
             "confidence": r.get("confidence"),
             "konkani_text": r.get("konkani_text", "")[:60],
         })
     else:
         ood_results["true_neg"] += 1
+        if mtype == "compositional":
+            ood_results["provisional"] += 1
+            ood_results["provisional_details"].append({
+                "query": q[:50],
+                "confidence": r.get("confidence"),
+                "coverage": r.get("coverage"),
+                "literal": r.get("literal_meaning", "")[:80],
+            })
 
 ood_rejection_rate = 100 * ood_results["true_neg"] / ood_results["total"]
-log(f"  OOD rejection rate: {ood_rejection_rate:.1f}% "
+log(f"  OOD corpus-claim rejection: {ood_rejection_rate:.1f}% "
     f"({ood_results['true_neg']}/{ood_results['total']})")
+log(f"  OOD answered by provisional reading: "
+    f"{100 * ood_results['provisional'] / ood_results['total']:.1f}%")
 for fp in ood_results["matched_to"]:
-    log(f"    FALSE-POSITIVE: {fp['query']!r} → {fp['match_type']} "
-        f"conf={fp['confidence']} → {fp['konkani_text']!r}")
+    log(f"    FALSE-POSITIVE (claimed as a known idiom): {fp['query']!r} "
+        f"→ {fp['match_type']} conf={fp['confidence']} → {fp['konkani_text']!r}")
+for pv in ood_results["provisional_details"]:
+    log(f"    provisional: {pv['query']!r} conf={pv['confidence']} "
+        f"coverage={pv['coverage']} → {pv['literal']!r}")
 
 pipeline_acc = {
     "romanized_correct_pct": round(100 * pos_results["rom"]["hit"] / pos_n, 2),
@@ -359,6 +380,15 @@ pipeline_acc = {
     "ood_false_pos": ood_results["false_pos"],
     "ood_rejection_pct": round(ood_rejection_rate, 2),
     "ood_false_positive_details": ood_results["matched_to"],
+    # New contract: non-dataset inputs get a provisional word-by-word reading.
+    "ood_provisional_pct": round(
+        100 * ood_results["provisional"] / ood_results["total"], 2),
+    "ood_provisional_details": ood_results["provisional_details"],
+    "ood_metric_definition": (
+        "A false positive is the system claiming a non-dataset input IS a known "
+        "proverb (match_type phonetic/semantic). Provisional compositional "
+        "answers are counted separately and are not false positives."
+    ),
 }
 
 # ════════════════════════════════════════════════════════════════════

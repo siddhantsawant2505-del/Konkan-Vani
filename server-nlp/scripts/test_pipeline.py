@@ -5,7 +5,10 @@ Standalone test script for the resolve_idiom() pipeline.
 Tests:
   A) 5 idioms exactly as they appear in the dataset       → expect matched: True
   B) Same 5 with deliberately altered spelling             → expect matched: True
-  C) 2 completely unrelated sentences                      → expect matched: False
+  C) 2 sentences that are NOT dataset idioms  → must NOT be claimed as a
+     corpus match; they get a provisional word-by-word reading instead
+     (match_type="compositional"). This replaces the old "matched: False"
+     contract, which showed the user an empty result screen.
 
 Run from project root:
     python server-nlp/scripts/test_pipeline.py
@@ -47,11 +50,15 @@ altered_cases = [
     ("Kaanak tel ghaalun bosop",     "altered_5"),  # aa→a
 ]
 
-# C) Completely unrelated sentences (should return matched: False)
+# C) Sentences that are NOT in the dataset. They must not be reported as a
+#    corpus match, but they must now be explained word by word.
 negative_cases = [
     ("The weather in Mumbai is very humid today",          "negative_1"),
     ("Ami gele bajar bharli pishwi",                       "negative_2"),  # plausible-looking Konkani not in dataset
+    ("आजचो दिस खूब गरम आसा",                              "negative_3"),  # Devanagari sentence, not an idiom
 ]
+
+CORPUS_MATCHES = {"phonetic", "semantic"}
 
 # ─────────────────────────────────────────────────────────────
 # RUNNER
@@ -95,9 +102,28 @@ print("\n── B) SPELLING-VARIANT IDIOMS (expect: matched=True) ────�
 for query, label in altered_cases:
     run_case(query, label, expect_match=True)
 
-print("\n── C) UNRELATED SENTENCES (expect: matched=False) ───────────────────")
+print("\n── C) NON-DATASET SENTENCES (expect: provisional reading, not a corpus match) ──")
 for query, label in negative_cases:
-    run_case(query, label, expect_match=False)
+    total += 1
+    result = resolve_idiom(query, store)
+    match_type = result.get("match_type")
+    provisional = result.get("provisional")
+    ok = (
+        result.get("matched") is True
+        and match_type == "compositional"
+        and provisional is True
+        and match_type not in CORPUS_MATCHES
+    )
+    if ok:
+        passed += 1
+    print(f"{'✅ PASS' if ok else '❌ FAIL'}  [{label}]")
+    print(f"      query      : {query!r}")
+    print(f"      expect     : match_type=compositional, provisional=True")
+    print(f"      got        : match_type={match_type}, provisional={provisional}, "
+          f"confidence={result.get('confidence')}")
+    print(f"      coverage   : {result.get('coverage')}")
+    print(f"      literal    : {result.get('literal_meaning')}")
+    print()
 
 print("=" * 70)
 print(f"RESULT: {passed}/{total} tests passed")

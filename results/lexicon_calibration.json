@@ -1,0 +1,144 @@
+{
+  "lexicon": "data/lexicon/konkani_lexicon.csv",
+  "entries": 376,
+  "content_gloss_pool": 296,
+  "model": "models/konkani-vani-encoder-v1 (fine-tuned LaBSE)",
+  "devanagari": {
+    "n": 317,
+    "recall_at_1": 0.4069,
+    "recall_at_3": 0.5457,
+    "recall_at_5": 0.6151,
+    "true_gloss_cosine": {
+      "mean": 0.6024,
+      "p25": 0.4227,
+      "median": 0.5957
+    },
+    "best_wrong_cosine": {
+      "mean": 0.634,
+      "p95": 0.8192
+    },
+    "sweep": [
+      {
+        "threshold": 0.5,
+        "accepted": 199,
+        "precision": 0.6432,
+        "coverage": 0.6278
+      },
+      {
+        "threshold": 0.55,
+        "accepted": 176,
+        "precision": 0.7159,
+        "coverage": 0.5552
+      },
+      {
+        "threshold": 0.6,
+        "accepted": 157,
+        "precision": 0.7707,
+        "coverage": 0.4953
+      },
+      {
+        "threshold": 0.63,
+        "accepted": 146,
+        "precision": 0.7945,
+        "coverage": 0.4606
+      },
+      {
+        "threshold": 0.66,
+        "accepted": 134,
+        "precision": 0.8134,
+        "coverage": 0.4227
+      },
+      {
+        "threshold": 0.7,
+        "accepted": 112,
+        "precision": 0.8661,
+        "coverage": 0.3533
+      },
+      {
+        "threshold": 0.75,
+        "accepted": 88,
+        "precision": 0.9432,
+        "coverage": 0.2776
+      },
+      {
+        "threshold": 0.8,
+        "accepted": 66,
+        "precision": 0.9545,
+        "coverage": 0.2082
+      }
+    ]
+  },
+  "roman": {
+    "n": 317,
+    "recall_at_1": 0.0473,
+    "recall_at_3": 0.1167,
+    "recall_at_5": 0.1483,
+    "true_gloss_cosine": {
+      "mean": 0.4384,
+      "p25": 0.369,
+      "median": 0.43
+    },
+    "best_wrong_cosine": {
+      "mean": 0.5905,
+      "p95": 0.7119
+    },
+    "sweep": [
+      {
+        "threshold": 0.5,
+        "accepted": 75,
+        "precision": 0.1867,
+        "coverage": 0.2366
+      },
+      {
+        "threshold": 0.55,
+        "accepted": 38,
+        "precision": 0.3421,
+        "coverage": 0.1199
+      },
+      {
+        "threshold": 0.6,
+        "accepted": 16,
+        "precision": 0.6875,
+        "coverage": 0.0505
+      },
+      {
+        "threshold": 0.63,
+        "accepted": 12,
+        "precision": 0.75,
+        "coverage": 0.0379
+      },
+      {
+        "threshold": 0.66,
+        "accepted": 9,
+        "precision": 0.6667,
+        "coverage": 0.0284
+      },
+      {
+        "threshold": 0.7,
+        "accepted": 4,
+        "precision": 0.75,
+        "coverage": 0.0126
+      },
+      {
+        "threshold": 0.75,
+        "accepted": 4,
+        "precision": 0.75,
+        "coverage": 0.0126
+      },
+      {
+        "threshold": 0.8,
+        "accepted": 2,
+        "precision": 1.0,
+        "coverage": 0.0063
+      }
+    ]
+  },
+  "shipped_threshold": 0.7,
+  "shipped_threshold_metrics": {
+    "threshold": 0.7,
+    "accepted": 112,
+    "precision": 0.8661,
+    "coverage": 0.3533
+  },
+  "decision": "The embedding stage runs on Devanagari tokens only, at the shipped threshold; romanised tokens are handled by exact/stem/phonetic/fuzzy lookup instead, because Recall@1 on roman input is an order of magnitude worse. Approximate glosses are always rendered with '≈' and never presented as dictionary entries."
+}

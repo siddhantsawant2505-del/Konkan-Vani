@@ -1,0 +1,377 @@
+devanagari,roman,phonetic_key,english_gloss,marathi_gloss,pos,semantic_tag,source
+गांव,gam,gam,village,गांव,noun,place,pattern_bank
+घर,ghar,ghar,house,घर,noun,place,pattern_bank
+शेत,shet,shet,farm field,शेत,noun,place,pattern_bank
+बाग,bag,bag,orchard,बाग,noun,place,pattern_bank
+फुल,ful,ful,flower,फुल,noun,place,pattern_bank
+झाड,zhad,jad,tree,झाड,noun,place,pattern_bank
+उदक,udak,udak,water,उदक,noun,place,pattern_bank
+न्हंय,nhoy,nhoy,river,न्हंय,noun,place,pattern_bank
+सागर,sagar,sagar,sea,सागर,noun,place,pattern_bank
+दोंगर,dongar,dongar,mountain,दोंगर,noun,place,pattern_bank
+माती,mati,mati,soil,माती,noun,place,pattern_bank
+वारो,waro,waro,wind,वारो,noun,place,pattern_bank
+पाऊस,paus,paus,rain,पाऊस,noun,place,pattern_bank
+सुर्य,sury,sury,sun,सुर्य,noun,place,pattern_bank
+चंद्र,chondr,chondr,moon,चंद्र,noun,place,pattern_bank
+तारे,tare,tare,stars,तारे,noun,place,pattern_bank
+माणीस,manis,manis,person,माणीस,noun,place,pattern_bank
+बायल,bayl,bayl,woman,बायल,noun,place,pattern_bank
+चेडू,chedu,chedu,boy,चेडू,noun,place,pattern_bank
+चेडगी,chedgi,chedgi,girl,चेडगी,noun,place,pattern_bank
+सुणो,suno,suno,dog,सुणो,noun,place,pattern_bank
+मांजर,manjar,manjar,cat,मांजर,noun,place,pattern_bank
+सुकणें,suknem,suknem,bird,सुकणें,noun,place,pattern_bank
+मासो,maso,maso,fish,मासो,noun,place,pattern_bank
+भात,bhat,bhat,rice,भात,noun,place,pattern_bank
+पोळी,poli,poli,flatbread,पोळी,noun,place,pattern_bank
+दूद,dud,dud,milk,दूद,noun,place,pattern_bank
+तूप,tup,tup,ghee,तूप,noun,place,pattern_bank
+मीठ,mith,mith,salt,मीठ,noun,place,pattern_bank
+तेल,tel,tel,oil,तेल,noun,place,pattern_bank
+विहीर,vihir,wihir,well,विहीर,noun,place,pattern_bank
+कुवो,kuvo,kuwo,drawn well,कुवो,noun,place,pattern_bank
+देवूळ,devul,dewul,temple,देवूळ,noun,place,pattern_bank
+शाळा,shala,shala,school,शाळा,noun,place,pattern_bank
+बाजार,bazar,bazar,market,बाजार,noun,place,pattern_bank
+बांद,band,band,embankment,बांद,noun,place,pattern_bank
+पूल,pul,pul,bridge,पूल,noun,place,pattern_bank
+वाट,wat,wat,path,वाट,noun,place,pattern_bank
+तालें,talem,talem,lake,तालें,noun,place,pattern_bank
+कोलंबो,kolombo,kolombo,pigeon coop,कोलंबो,noun,place,pattern_bank
+तारवां,tarwam,tarwam,boat,तारवां,noun,place,pattern_bank
+दोणू,donu,donu,canoe,दोणू,noun,place,pattern_bank
+कांदो,kando,kando,onion,कांदो,noun,place,pattern_bank
+आंबो,ambo,ambo,mango,आंबो,noun,place,pattern_bank
+नारळ,naral,naral,coconut,नारळ,noun,place,pattern_bank
+काजू,kaju,kaju,cashew,काजू,noun,place,pattern_bank
+मिरसांग,mirsang,mirsang,chili,मिरसांग,noun,place,pattern_bank
+हळद,halad,halad,turmeric,हळद,noun,place,pattern_bank
+कोकम,kokam,kokam,kokum,कोकम,noun,place,pattern_bank
+वांय,way,way,bamboo,वांय,noun,place,pattern_bank
+खरें,kharem,kharem,fishing net,खरें,noun,place,pattern_bank
+सण,san,san,festival,सण,noun,place,pattern_bank
+जात्रो,jatro,jatro,fair procession,जात्रो,noun,place,pattern_bank
+दीवो,diwo,diwo,lamp,दीवो,noun,place,pattern_bank
+अग्नी,agni,agni,fire,अग्नी,noun,place,pattern_bank
+मोडो,modo,modo,harvest bundle,मोडो,noun,place,pattern_bank
+गिरेस्त,girest,girest,rich man,गिरेस्त,noun,place,pattern_bank
+गरीब,garib,garib,poor man,गरीब,noun,place,pattern_bank
+भुरगें,bhurgem,bhurgem,child,भुरगें,noun,place,pattern_bank
+व्हडलो,vhadlo,whadlo,elder,व्हडलो,noun,place,pattern_bank
+बोलप,bolap,bolap,speaks,बोलप,verb,motion,pattern_bank
+आयकप,aaykap,aykap,listens,आयकप,verb,motion,pattern_bank
+पळोवप,palovap,palowap,watches,पळोवप,verb,motion,pattern_bank
+जावप,javap,jawap,becomes,जावप,verb,motion,pattern_bank
+येवप,yevap,yewap,comes,येवप,verb,motion,pattern_bank
+धरप,dharap,dharap,holds,धरप,verb,motion,pattern_bank
+सोडप,sodap,sodap,releases,सोडप,verb,motion,pattern_bank
+दिवप,divap,diwap,gives,दिवप,verb,motion,pattern_bank
+घेवप,ghevap,ghewap,takes,घेवप,verb,motion,pattern_bank
+खावप,khavap,khawap,eats,खावप,verb,motion,pattern_bank
+पियेवप,piyevap,piyewap,drinks,पियेवप,verb,motion,pattern_bank
+बसप,bosap,bosap,sits,बसप,verb,motion,pattern_bank
+वचप,vachap,wachap,goes,वचप,verb,motion,pattern_bank
+करप,karap,karap,does,करप,verb,motion,pattern_bank
+बांदप,bandap,bandap,builds,बांदप,verb,motion,pattern_bank
+शिकप,shikap,shikap,learns,शिकप,verb,motion,pattern_bank
+वाचप,vachap,wachap,reads,वाचप,verb,motion,pattern_bank
+बरोवप,barovap,barowap,writes,बरोवप,verb,motion,pattern_bank
+हांसप,hansap,hansap,laughs,हांसप,verb,motion,pattern_bank
+रडप,radap,radap,weeps,रडप,verb,motion,pattern_bank
+नाचप,nachap,nachap,dances,नाचप,verb,motion,pattern_bank
+गावप,gavap,gawap,sings,गावप,verb,motion,pattern_bank
+चलप,cholap,cholap,walks,चलप,verb,motion,pattern_bank
+धांवप,dhavap,dhawap,runs,धांवप,verb,motion,pattern_bank
+फळ,fal,fal,it,फळ,noun,emotion,pattern_bank_outcome
+मेळटा,melta,melta,bears,मेळटा,noun,emotion,pattern_bank_outcome
+नुकसान,nukasan,nukasan,it,नुकसान,noun,emotion,pattern_bank_outcome
+जाता,jata,jata,causes,जाता,noun,emotion,pattern_bank_outcome
+भलें,bhalen,bhalen,good,भलें,noun,emotion,pattern_bank_outcome
+वायट,wayt,wayt,it,वायट,noun,emotion,pattern_bank_outcome
+शांती,shanti,shanti,peace,शांती,noun,emotion,pattern_bank_outcome
+गोंधळ,gondhal,gondhal,turmoil,गोंधळ,noun,emotion,pattern_bank_outcome
+उदर्गमी,udargami,udargami,progress,उदर्गमी,noun,emotion,pattern_bank_outcome
+अपेस,apes,apes,failure,अपेस,noun,emotion,pattern_bank_outcome
+आनंद,anand,anand,joy,आनंद,noun,emotion,pattern_bank_outcome
+त्रास,tras,tras,trouble,त्रास,noun,emotion,pattern_bank_outcome
+फायदो,faydo,faydo,profit,फायदो,noun,emotion,pattern_bank_outcome
+सन्मान,sanman,sanman,honour,सन्मान,noun,emotion,pattern_bank_outcome
+नामना,namna,namna,fame,नामना,noun,emotion,pattern_bank_outcome
+दुख्ख,dukkh,dukkh,sorrow,दुख्ख,noun,emotion,pattern_bank_outcome
+यश,yash,yash,success,यश,noun,emotion,pattern_bank_outcome
+अपमान,apman,apman,humiliation,अपमान,noun,emotion,pattern_bank_outcome
+मोल,mol,mol,it,मोल,noun,emotion,pattern_bank_outcome
+जोड,jod,jod,a,जोड,noun,emotion,pattern_bank_outcome
+म्हणजे,mhanje,mhanje,means / that is to say,म्हणजे,connective,connective,curated
+आनी,aani,ani,and,आणि,connective,connective,curated
+जिल्यार,jilyar,jilyar,if / when,जर,connective,connective,curated
+एक,ek,ek,one / a single,एक,quantifier,quantifier,curated
+दोनूय,donui,donui,both,दोन्ही,quantifier,quantifier,curated
+सर्वात,sarvaat,sarwat,above all / most of all,सर्वात,quantifier,quantifier,curated
+कुठली,kuthli,kuthli,some / any,कोणती,quantifier,quantifier,curated
+तितलें,titlem,titlem,that much,तेवढे,quantifier,quantifier,curated
+मोठो,mothho,mothho,big / great,मोठा,adjective,quality,curated
+मोठं,motham,motham,great / large,मोठे,adjective,quality,curated
+लांब,laamb,lamb,far / long,लांब,adjective,quality,curated
+हलके,halke,halke,lightly / gently,हलके,adverb,quality,curated
+खरे,khare,khare,true / genuine,खरे,adjective,quality,curated
+गोड,god,god,sweet / pleasant,गोड,adjective,quality,curated
+ताजे,taaje,taje,fresh,ताजे,adjective,quality,curated
+ओले,oele,oele,wet / damp,ओले,adjective,quality,curated
+उबदार,ubadaar,ubadar,warm / cosy,उबदार,adjective,quality,curated
+तेजस्वी,tejasvi,tejaswi,radiant / bright,तेजस्वी,adjective,quality,curated
+हिरव्यागार,hirvyaagar,hirwyagar,lush green,हिरवागार,adjective,quality,curated
+सोनेरी,soneri,soneri,golden,सोनेरी,adjective,quality,curated
+योग्य,yogya,yogya,proper / fitting,योग्य,adjective,quality,curated
+अंतिम,antim,antim,final,अंतिम,adjective,quality,curated
+साधू,saadhu,sadhu,ascetic / holy man,साधू,noun,person,curated
+भोंदू,bhoodu,bhudu,fraud / impostor,भोंदू,noun,person,curated
+आपलें,aplem,aplem,one's own,आपले,quantifier,quality,curated
+आहे,aahe,ahe,is / there is,आहे,auxiliary,auxiliary,curated
+असता,asta,asta,is / happens,असते,auxiliary,auxiliary,curated
+आसा,aasa,asa,is,आहे,auxiliary,auxiliary,curated
+हवे,have,hawe,is needed / should,हवे,auxiliary,auxiliary,curated
+हवा,havaa,hawa,is needed / should,हवा,auxiliary,auxiliary,curated
+पाहिजे,pahije,pahije,must / ought to,पाहिजे,auxiliary,auxiliary,curated
+न्हय,nhay,nhay,is not,नाही,negation,negation,curated
+नाही,nahi,nahi,is not,नाही,negation,negation,curated
+ना,na,na,not / no,नाही,negation,negation,curated
+नात,naat,nat,not / is not,नाही,negation,negation,curated
+नका,naka,naka,do not / must not,नको,negation,negation,curated
+न,n,n,not,न,negation,negation,curated
+हात,haat,hat,hand,हात,noun,body,curated
+हाताक,haatak,hatak,the hand,हाताला,noun,body,curated
+पाय,paay,pay,foot / leg,पाय,noun,body,curated
+पायां,payam,payam,feet,पायां,noun,body,curated
+मुंडो,mudo,mudo,head,डोके,noun,body,curated
+डोळे,dolle,dolle,eyes,डोळे,noun,body,curated
+डोळ्यांत,dollyant,dollyant,in the eyes,डोळ्यांत,noun,body,curated
+कान,kaan,kan,ear,कान,noun,body,curated
+कानाक,kanak,kanak,the ear,कानाला,noun,body,curated
+पोट,pot,pot,stomach / belly,पोट,noun,body,curated
+पाठीशी,paatshi,patshi,at the back / in support,पाठीशी,noun,body,curated
+कुशीत,kushit,kushit,in the lap / side,कुशीत,noun,body,curated
+चव,chav,chaw,taste,चव,noun,food,curated
+पाणी,paani,pani,water,पाणी,noun,water,curated
+पाण्यात,paanyat,panyat,in the water,पाण्यात,noun,water,curated
+पाण्याच्या,panyachi,panyachi,of the water,पाण्याच्या,noun,water,curated
+पाण्यावर,panyavar,panyawar,on the water,पाण्यावर,noun,water,curated
+उदकाचो,udcacho,udcacho,of the water,पाण्याचा,noun,water,curated
+व्हाळेर,valor,walor,overflow / flood,पूर,noun,water,curated
+खळखळ,khalkhal,khalkhal,gurgling sound of flowing water,खळखळ,noun,water,curated
+मातीत,maatit,matit,in the soil,मातीत,noun,nature,curated
+फुलांना,phulanna,fulanna,the flowers,फुलांना,noun,nature,curated
+कळी,kali,kali,bud,कळी,noun,nature,curated
+कोंब,komb,komb,sprout / shoot,कोंब,noun,nature,curated
+रोप,rop,rop,sapling,रोप,noun,nature,curated
+झुडूपात,zhudupaat,judupat,in the bush,झुडुपात,noun,nature,curated
+पावसाळ्यात,paavsaalyaat,pawsalyat,in the rainy season,पावसाळ्यात,noun,time,curated
+उन्हाळ्यात,unhaalyaat,unhalyat,in the hot season,उन्हाळ्यात,noun,time,curated
+हिवाळ्यात,hivaalyaat,hiwalyat,in the cold season,हिवाळ्यात,noun,time,curated
+ऊन,un,un,sunshine / heat,ऊन,noun,nature,curated
+सूर्याला,suryala,suryala,the sun,सूर्याला,noun,nature,curated
+तार्यांकडे,taaryaakade,taryakade,towards the stars,ताऱ्यांकडे,noun,nature,curated
+वाऱ्यासोबत,vaaryasobat,waryasobat,along with the wind,वाऱ्यासोबत,noun,nature,curated
+सागरात,saagarat,sagarat,in the sea,समुद्रात,noun,water,curated
+सागरी,saagari,sagari,at the sea,समुद्री,noun,water,curated
+नदी,nadi,nadi,river,नदी,noun,water,curated
+नदीत,nadit,nadit,in the river,नदीत,noun,water,curated
+नदीला,nadilaa,nadila,the river,नदीला,noun,water,curated
+तळ्याच्या,talyachya,talyachya,of the lake,तळ्याच्या,noun,water,curated
+ढग,dhag,dhag,cloud,ढग,noun,nature,curated
+ढगांमध्ये,dhagaanmadhye,dhaganmadhye,among the clouds,ढगांमध्ये,noun,nature,curated
+धूळ,dhool,dhul,dust,धूळ,noun,nature,curated
+छाया,chaayaa,chaya,shade,सावली,noun,nature,curated
+बिजूरी,bijuri,bijuri,lightning,वीज,noun,nature,curated
+उब,ub,ub,warmth,उब,noun,nature,curated
+मासे,maase,mase,fish (plural),मासे,noun,animal,curated
+मास,maas,mas,fish,मासा,noun,animal,curated
+गाय,gaay,gay,cow,गाय,noun,animal,curated
+दुधारी,dudhari,dudhari,milch (giving milk),दुधाळ,adjective,animal,curated
+मांजराक,mazrak,mazrak,the cat,मांजराला,noun,animal,curated
+मांजरासारखा,mazrasarkha,mazrasarkha,like a cat,मांजरासारखा,adjective,animal,curated
+साप,saap,sap,snake,साप,noun,animal,curated
+वाघ,vaagh,wagh,tiger,वाघ,noun,animal,curated
+कोंबो,kombo,kombo,rooster / chick,पिल्लू,noun,animal,curated
+कोंबा,komba,komba,rooster / chick,पिल्लू,noun,animal,curated
+कोंब्याक,kombyak,kombyak,the chick,पिल्लाला,noun,animal,curated
+कोंब्याला,kombyala,kombyala,the chick,पिल्लाला,noun,animal,curated
+सुकण्यान,suknyan,suknyan,bird (ergative form),पक्ष्याने,noun,animal,curated
+माशी,maashi,mashi,fly (insect),माशी,noun,animal,curated
+मोरांक,morank,morank,the peacocks,मोरांना,noun,animal,curated
+भाताच्या,bhatyachi,bhatyachi,of the rice,भाताच्या,noun,food,curated
+पोळीत,polit,polit,in the flatbread,पोळीत,noun,food,curated
+दूध,doodh,dudh,milk,दूध,noun,food,curated
+नून,noon,nun,salt,मीठ,noun,food,curated
+मिठा,mitha,mitha,salt (oblique form),मिठाचा,noun,food,curated
+भाजी,bhaji,bhaji,vegetable dish,भाजी,noun,food,curated
+भाज्यासारखे,bhajyasarakhe,bhajyasarakhe,like a vegetable,भाजीसारखे,adjective,food,curated
+आंब्याच्या,aambyaachi,ambyachi,of the mango,आंब्याच्या,noun,food,curated
+अन्न,anna,anna,food / grain,अन्न,noun,food,curated
+जेवण,jevan,jewan,meal,जेवण,noun,food,curated
+प्रसाद,prasaad,prasad,blessed offering (prasad),प्रसाद,noun,ritual,curated
+मेथी,methi,methi,fenugreek,मेथी,noun,food,curated
+मसाले,masale,masale,spices,मसाले,noun,food,curated
+संभार,sambhaar,sambhar,ingredients / provisions,साहित्य,noun,food,curated
+हळदी,haladi,haladi,of turmeric,हळदी,noun,food,curated
+कापूस,kaapus,kapus,cotton,कापूस,noun,food,curated
+घराचेर,ghoracher,ghoracher,on the house,घरावर,noun,place,curated
+गावात,gaavaat,gawat,in the village,गावात,noun,place,curated
+गावाकडच्या,gaavakadchya,gawakadchya,of the village side,गावाकडच्या,noun,place,curated
+देवळातला,devlaatla,dewlatla,of the temple,देवळातला,noun,place,curated
+विहिरीत,vihirrit,wihirrit,in the well,विहिरीत,noun,place,curated
+बांदार,bandar,bandar,harbour / port,बंदर,noun,place,curated
+तारवांचेर,tarvancheir,tarwancheir,on the boats,नावांवर,noun,place,curated
+कुंभार,kumbhaar,kumbhar,potter,कुंभार,noun,person,curated
+कुंभाराच्या,kumbharyachya,kumbharyachya,of the potter,कुंभाराच्या,noun,person,curated
+भांडे,bhande,bhande,pot / vessel,भांडे,noun,place,curated
+भांड्यासारखे,bhandyasarkhe,bhandyasarkhe,like a pot,भांड्यासारखे,adjective,place,curated
+कुलूप,kulup,kulup,lock,कुलूप,noun,place,curated
+दिवो,divo,diwo,lamp,दिवा,noun,ritual,curated
+दिवा,divaa,diwa,lamp,दिवा,noun,ritual,curated
+आरतीचा,aarateechea,aratichea,of the aarti lamp,आरतीचा,noun,ritual,curated
+ज्योतीत,jyotit,jyotit,in the flame,ज्योतीत,noun,ritual,curated
+विंदी,vindi,windi,dot / rangoli mark,रांगोळी,noun,ritual,curated
+मांडव,mandav,mandaw,wedding pandal,मांडव,noun,ritual,curated
+कोलंबीत,kolambit,kolambit,in the pigeon coop,कबुतरखान्यात,noun,place,curated
+उंबरा,umbra,umbra,threshold,उंबरा,noun,place,curated
+आळ्याच्या,aalyachya,alyachya,of the lane,गल्लीच्या,noun,place,curated
+माणूस,manus,manus,person / human being,माणूस,noun,person,curated
+माणसाला,mansala,mansala,the person,माणसाला,noun,person,curated
+मनशान,manshan,manshan,person (ergative form),माणसाने,noun,person,curated
+मुलांना,mulaanna,mulanna,the children,मुलांना,noun,person,curated
+आई,aai,ai,mother,आई,noun,person,curated
+आईचा,aaichee,aichi,of the mother,आईचा,noun,person,curated
+वडील,vadil,wadil,father / elder,वडील,noun,person,curated
+वडिलांचे,vadilaanche,wadilanche,of the parents/elders,वडिलांचे,noun,person,curated
+भावाभावी,bhaavabhaavi,bhawabhawi,brother with brother,भावाभावात,noun,person,curated
+कुटुंब,kutumb,kutumb,family,कुटुंब,noun,person,curated
+पोट्यार,potyaar,potyar,boatman,नावाडी,noun,person,curated
+विश्वास,vishwaas,wishwas,trust / faith,विश्वास,noun,emotion,curated
+मदत,madat,madat,help,मदत,noun,emotion,curated
+मेहनत,mehnat,mehnat,hard work,मेहनत,noun,quality,curated
+शिक्षण,shikshan,shikshan,education,शिक्षण,noun,quality,curated
+आरोग्य,aarogy,arogy,health,आरोग्य,noun,quality,curated
+धन,dhan,dhan,wealth,धन,noun,quality,curated
+पैसा,paisaa,paisa,money,पैसा,noun,quality,curated
+काम,kaam,kam,work,काम,noun,quality,curated
+व्यापारात,vyaapaaraat,wyaparat,in business / trade,व्यापारात,noun,quality,curated
+नोकरीचा,nokreecha,nokricha,of the job,नोकरीचा,noun,quality,curated
+आदर,aadar,adar,respect,आदर,noun,emotion,curated
+आशीर्वाद,aashirvaad,ashirwad,blessing,आशीर्वाद,noun,ritual,curated
+शब्द,shabd,shabd,word / promise,शब्द,noun,speech,curated
+वेळ,vel,wel,time,वेळ,noun,time,curated
+वेळेवर,velevar,welewar,on time,वेळेवर,noun,time,curated
+शेवटाला,shevtala,shewtala,in the end / finally,शेवटी,adverb,time,curated
+सुसेगाद,susegad,susegad,"peaceful, unhurried contentment",शांत समाधान,noun,emotion,curated
+शरीर,shareer,sharir,body,शरीर,noun,body,curated
+योग,yoga,yoga,yoga / discipline,योग,noun,quality,curated
+उत्सव,utsav,utsaw,festival,उत्सव,noun,ritual,curated
+सुक्तोच,suktoch,suktoch,dries up / empties,सुकते,verb,motion,curated
+कोल्लटा,collta,collta,flows down / spills,वाहते,verb,motion,curated
+बरें,borem,borem,good / well,बरे,adjective,quality,curated
+दिसता,dista,dista,seems / looks,दिसते,verb,perception,curated
+शिंक,shink,shink,sneeze,शिंक,noun,body,curated
+कोंदळ,kondal,kondal,tangle / clutter,गोंधळ,noun,emotion,curated
+मळ,mal,mal,dirt / grime,घाण,noun,quality,curated
+गाठप,gaathap,gathap,reach,गाठणे,verb,motion,curated
+करा,kara,kara,do (polite imperative),करा,verb,motion,curated
+करू,karu,karu,let us do / will do,करू,verb,motion,curated
+करणे,karane,karane,to do,करणे,verb,motion,curated
+येत,yete,yete,comes,येते,verb,motion,curated
+येता,yeta,yeta,comes,येते,verb,motion,curated
+आला,aala,ala,came,आला,verb,motion,curated
+गेलें,gele,gele,went / gone,गेले,verb,motion,curated
+गेले,gele,gele,went / gone,गेले,verb,motion,curated
+जायला,jaayla,jayla,in order to go,जायला,verb,motion,curated
+व्हा,vhaa,wha,become (imperative),हो,verb,motion,curated
+बनवप,banavap,banawap,make,बनवणे,verb,motion,curated
+बनून,banun,banun,having become,बनून,verb,motion,curated
+द्या,dyaa,dya,give (imperative),द्या,verb,speech,curated
+दाखवप,dakhavap,dakhawap,show,दाखवणे,verb,speech,curated
+दाखवून,dakhvun,dakhwun,having shown,दाखवून,verb,speech,curated
+सांगप,sangap,sangap,tell,सांगणे,verb,speech,curated
+सांगणे,sangane,sangane,tell,सांगणे,verb,speech,curated
+पिऊन,pionn,pionn,having drunk,पिऊन,verb,food,curated
+विसर,visor,wisor,forget,विसर,verb,perception,curated
+बसून,bosun,bosun,having sat,बसून,verb,motion,curated
+रावप,ravop,rawop,stay / remain,राहणे,verb,motion,curated
+राहा,rahaa,raha,stay (imperative),रहा,verb,motion,curated
+रहा,rahaa,raha,stay (imperative),रहा,verb,motion,curated
+घालप,ghalap,ghalap,put / wear,घालणे,verb,motion,curated
+घालून,ghalun,ghalun,having put,घालून,verb,motion,curated
+घालचें,ghalchem,ghalchem,has to be put,घालायचे,verb,motion,curated
+मारप,marap,marap,hit / strike,मारणे,verb,motion,curated
+मारून,maarun,marun,having hit / doing thoroughly,मारून,verb,motion,curated
+लावप,lavap,lawap,apply / plant,लावणे,verb,motion,curated
+लागप,laap,lap,be needed / take effect,लागणे,verb,motion,curated
+लागतो,lagto,lagto,is needed / takes,लागतो,verb,motion,curated
+लावण्याचा,laavanyaacha,lawanyacha,of planting,लावण्याचा,verb,motion,curated
+ठेवप,thevap,thewap,keep,ठेवणे,verb,motion,curated
+ठेवा,thevaa,thewa,keep (imperative),ठेवा,verb,motion,curated
+राखप,rakhap,rakhap,keep / protect,राखणे,verb,motion,curated
+राखपाक,rakhpak,rakhpak,in order to keep,राखण्यासाठी,verb,motion,curated
+टाकप,takap,takap,put / throw,टाकणे,verb,motion,curated
+टाका,taka,taka,put / throw (imperative),टाका,verb,motion,curated
+टाकलेली,takleli,takleli,having been put,टाकलेली,verb,motion,curated
+सापडप,sapdap,sapdap,be found,सापडणे,verb,perception,curated
+सापडलेल्याला,sapadlyala,sapadlyala,the one who found,सापडलेल्याला,verb,perception,curated
+शोधणे,shodhane,shodhane,search,शोधणे,verb,perception,curated
+उगवप,ugavap,ugawap,sprout / rise,उगवणे,verb,motion,curated
+उडप,udap,udap,fly,उडणे,verb,motion,curated
+उडता,udta,udta,flies,उडतो,verb,motion,curated
+हलप,halap,halap,move / shake,हलणे,verb,motion,curated
+पाडप,padap,padap,make fall / drop,पाडणे,verb,motion,curated
+फुटप,futap,futap,break / split,फुटणे,verb,motion,curated
+फोडप,fodap,fodap,break open,फोडणे,verb,motion,curated
+भांडप,bhandap,bhandap,quarrel,भांडणे,verb,speech,curated
+शिंपडप,shimpdap,shimpdap,sprinkle,शिंपडणे,verb,motion,curated
+शिंपडतात,shimpadtaat,shimpadtat,they sprinkle,शिंपडतात,verb,motion,curated
+मापप,maapap,mapap,measure,मोजणे,verb,motion,curated
+धुणप,dhunap,dhunap,wash,धुणे,verb,motion,curated
+जिंकप,jinkap,jinkap,win / conquer,जिंकणे,verb,motion,curated
+जिखलो,jikhlo,jikhlo,conquered,जिंकले,verb,motion,curated
+लिहिलेले,lihilele,lihilele,written,लिहिलेले,verb,speech,curated
+आणणे,aanaane,anane,bring,आणणे,verb,motion,curated
+अडवू,adavu,adawu,stop / block,अडवणे,verb,motion,curated
+उचला,uchala,uchala,lift (imperative),उचला,verb,motion,curated
+स्नान,snaan,snan,bath,स्नान,noun,ritual,curated
+मिळवा,milavaa,milawa,earn / obtain (imperative),मिळवा,verb,motion,curated
+साजरा,saajraa,sajra,celebrate (imperative),साजरा,verb,ritual,curated
+राहील,rahil,rahil,will remain,राहील,verb,motion,curated
+धुवून,dhuvun,dhuwun,having washed,धुवून,verb,motion,curated
+धुवप,dhuvap,dhuwap,wash,धुवणे,verb,motion,curated
+गेलो,gelo,gelo,went (m.),गेला,verb,motion,curated
+गेली,geli,geli,went (f.),गेली,verb,motion,curated
+घेतली,ghetli,ghetli,took (f.),घेतली,verb,motion,curated
+घेतलो,ghetlo,ghetlo,took (m.),घेतला,verb,motion,curated
+घेणे,ghene,ghene,take,घेणे,verb,motion,curated
+केलो,kelo,kelo,did (m.),केला,verb,motion,curated
+केली,keli,keli,did (f.),केली,verb,motion,curated
+दिलो,dilo,dilo,gave (m.),दिला,verb,speech,curated
+दिली,dili,dili,gave (f.),दिली,verb,speech,curated
+जालो,jalo,jalo,became (m.),झाला,verb,motion,curated
+जाली,jali,jali,became (f.),झाली,verb,motion,curated
+म्हणून,mhanun,mhanun,saying / therefore,म्हणून,connective,connective,curated
+बोलून,bolun,bolun,having spoken,बोलून,verb,speech,curated
+आयकून,aaykun,aykun,having listened,ऐकून,verb,speech,curated
+चलून,cholun,cholun,having walked,चालून,verb,motion,curated
+धांवून,dhavun,dhawun,having run,धावून,verb,motion,curated
+खाऊन,khaun,khaun,having eaten,खाऊन,verb,food,curated
+पळोवून,palovun,palowun,having seen,पाहून,verb,perception,curated
+देखून,dekhun,dekhun,having seen,पाहून,verb,perception,curated
+उठून,uthun,uthun,having got up,उठून,verb,motion,curated
+फिरप,firap,firap,wander,फिरणे,verb,motion,curated
+उरप,urap,urap,remain,उरणे,verb,motion,curated
+हांव,hanv,hanw,I,मी,pronoun,person,curated
+आमी,aami,ami,we,आमी,pronoun,person,curated
+तूं,tun,tun,you (singular),तू,pronoun,person,curated
+तुमी,tumi,tumi,you (plural),तुम्ही,pronoun,person,curated
+तो,to,to,he / that,तो,pronoun,person,curated
+ती,ti,ti,she / that,ती,pronoun,person,curated
+ते,te,te,they / those,ते,pronoun,person,curated
+हो,ho,ho,yes / it is,हो,auxiliary,auxiliary,curated
+तांदूळ,tandul,tandul,rice grain,तांदूळ,noun,food,curated
+शित,shit,shit,cooked rice,भात,noun,food,curated
+पोटांत,potant,potant,in the stomach,पोटात,noun,body,curated

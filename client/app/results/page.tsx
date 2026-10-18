@@ -6,8 +6,9 @@ import Link from "next/link";
 import SideNavBar from "@/components/SideNavBar";
 import ScriptToggle from "@/components/ScriptToggle";
 import ConfidenceBadge from "@/components/ConfidenceBadge";
+import ProvisionalMeaning from "@/components/ProvisionalMeaning";
 import { searchIdioms } from "@/lib/api";
-import type { SearchResult, Script } from "@/lib/types";
+import type { SearchResult, Script, ProvisionalReading } from "@/lib/types";
 
 interface ApiError {
   message: string;
@@ -20,6 +21,9 @@ function ResultsContent() {
 
   const [inputQuery, setInputQuery] = useState(query);
   const [results, setResults] = useState<SearchResult[]>([]);
+  // Word-by-word reading the backend composes when nothing in the corpus
+  // matches, so an unknown proverb still gets explained.
+  const [provisional, setProvisional] = useState<ProvisionalReading | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeScript, setActiveScript] = useState<Script>("devanagari");
@@ -31,6 +35,7 @@ function ResultsContent() {
     searchIdioms(query)
       .then((res) => {
         setResults(res.results);
+        setProvisional(res.provisional ?? null);
         setError(null);
       })
       .catch((e: ApiError) => {
@@ -89,7 +94,13 @@ function ResultsContent() {
             </h2>
             <p className="font-['Hanken_Grotesk'] text-sm text-[#594139] mt-1">
               Query: <strong className="text-[#973100] font-semibold">&ldquo;{query}&rdquo;</strong> —{" "}
-              {loading ? "Searching..." : `${results.length} matched expression${results.length === 1 ? "" : "s"}`}
+              {loading
+                ? "Searching..."
+                : results.length > 0
+                  ? `${results.length} matched expression${results.length === 1 ? "" : "s"}`
+                  : provisional
+                    ? "No exact match — meaning composed word by word below"
+                    : "No matched expressions"}
             </p>
           </div>
           <Link
@@ -294,16 +305,24 @@ function ResultsContent() {
               </section>
             )}
           </div>
+        ) : provisional ? (
+          <ProvisionalMeaning
+            reading={provisional}
+            query={query}
+            activeScript={activeScript}
+          />
         ) : (
           <div className="bg-white rounded-3xl p-12 text-center border border-[#f7e0b5]">
             <span className="material-symbols-outlined text-5xl text-[#8d7167] mb-4">
               sentiment_dissatisfied
             </span>
             <h3 className="font-['EB_Garamond'] text-2xl font-bold text-[#251a01] mb-2">
-              No direct matches found for &ldquo;{query}&rdquo;
+              Nothing to analyse for &ldquo;{query}&rdquo;
             </h3>
             <p className="text-sm text-[#594139] max-w-md mx-auto mb-6">
-              Try searching with alternative Roman spelling (e.g. <em>Haat dakhvun</em>, <em>Udak pionn</em>) or explore our curated collection.
+              Enter Konkani words in Devanagari or Roman script and the system
+              will gloss them one by one. For a known proverb, try an alternative
+              spelling (e.g. <em>Haat dakhvun</em>, <em>Udak pionn</em>).
             </p>
             <Link
               href="/explore"

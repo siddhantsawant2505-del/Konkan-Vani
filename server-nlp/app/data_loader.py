@@ -37,6 +37,14 @@ class IdiomStore:
             )
         self.embeddings = np.load(_EMB_PATH)
 
+        # Column caches used by the substring pre-filter in search_idioms().
+        # Building them once turns a 5,200-row scan of get_row() calls (each of
+        # which touches pandas) into a flat list scan.
+        self._roman_lower = (
+            self.df["romanized_text"].fillna("").astype(str).str.lower().tolist()
+        )
+        self._konkani_raw = self.df["konkani_text"].fillna("").astype(str).tolist()
+
         # Sanity check: row counts must match
         assert len(self.df) == len(self.embeddings), (
             f"Stale embeddings detected: CSV has {len(self.df)} rows "
@@ -47,6 +55,8 @@ class IdiomStore:
         # Load FAISS index if available
         self.faiss_index = None
         self.faiss_metadata = None
+        self._roman_lower = []
+        self._konkani_raw = []
         self._load_faiss_index()
 
     def _load_faiss_index(self):
@@ -123,6 +133,20 @@ class IdiomStore:
             "cultural_context":   str(row.get("cultural_context", "")),
             "source":             str(row.get("source", "")),
         }
+
+    def substring_hits(self, query_lower: str, query_raw: str,
+                       limit: int = 10) -> list[tuple[int, str]]:
+        """Rows whose romanised text contains ``query_lower`` or whose
+        Devanagari text contains ``query_raw``. Returns (index, field)."""
+        hits = []
+        for idx, (rom, konk) in enumerate(zip(self._roman_lower, self._konkani_raw)):
+            if query_lower and query_lower in rom:
+                hits.append((idx, "romanized_text"))
+            elif query_raw and query_raw in konk:
+                hits.append((idx, "konkani_text"))
+            if len(hits) >= limit:
+                break
+        return hits
 
     def all_phonetic_keys(self) -> list[str]:
         return self.df["phonetic_key"].fillna("").tolist()

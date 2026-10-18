@@ -19,7 +19,56 @@ export interface Idiom {
   phonetic_key?: string;          // Normalized phonetic key for search
 }
 
-export type MatchType = "exact" | "phonetic" | "semantic" | "fuzzy";
+export type MatchType =
+  | "exact"
+  | "phonetic"
+  | "semantic"
+  | "fuzzy"
+  // Word-by-word reading of an idiom that is not in the corpus.
+  | "compositional";
+
+/** How one word of an unknown proverb was glossed by the backend. */
+export interface WordGloss {
+  token: string;
+  devanagari: string;
+  roman: string;
+  english: string;
+  marathi: string;
+  pos: string;
+  tag: string;
+  method: "exact" | "suffix" | "phonetic" | "fuzzy" | "embedding" | "none";
+  similarity: number;
+  /** True for cross-lingual guesses that are not dictionary entries. */
+  approximate: boolean;
+  known: boolean;
+}
+
+/** Nearest corpus entry, shown even when too weak to count as a match. */
+export interface ClosestKnown {
+  id: string;
+  konkani_text: string;
+  romanized_text: string;
+  english_meaning: string;
+  figurative_meaning: string;
+  category: string;
+  similarity: number;
+}
+
+/** Composed reading of a proverb that the corpus does not contain. */
+export interface ProvisionalReading {
+  match_type: string;
+  confidence: number;
+  literal_meaning: string;
+  english_meaning: string;
+  figurative_meaning: string;
+  marathi_meaning: string;
+  coverage: { glossed: number; total: number; ratio: number };
+  themes: string[];
+  negated: boolean;
+  word_glosses: WordGloss[];
+  closest_known: ClosestKnown[];
+  notes: string[];
+}
 
 export interface SearchResult {
   idiom: Idiom;
@@ -32,6 +81,8 @@ export interface SearchResponse {
   query: string;
   results: SearchResult[];
   total: number;
+  /** Present only when nothing matched, so the UI can explain the proverb. */
+  provisional?: ProvisionalReading | null;
 }
 
 export interface BrowseResponse {

@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-12 11:15:37",
+  "timestamp": "2026-10-18 02:09:22",
   "environment": {
     "python": "3.12.5",
     "platform": "Windows-11-10.0.26200-SP0",
@@ -56,7 +56,7 @@
     "search_backend": "FAISS index"
   },
   "model": {
-    "loaded_in_s": 18.82,
+    "loaded_in_s": 27.87,
     "device": "cuda"
   },
   "retrieval_stage_accuracy": {
@@ -106,7 +106,91 @@
     "ood_true_neg": 8,
     "ood_false_pos": 0,
     "ood_rejection_pct": 100.0,
-    "ood_false_positive_details": []
+    "ood_false_positive_details": [],
+    "ood_provisional_pct": 100.0,
+    "ood_provisional_details": [
+      {
+        "query": "what is the capital of France?",
+        "confidence": 0.0833,
+        "coverage": {
+          "glossed": 1,
+          "total": 6,
+          "ratio": 0.1667
+        },
+        "literal": "path · [is] · [the] · [capital] · [of] · [France]"
+      },
+      {
+        "query": "recipe for chocolate cake with eggs",
+        "confidence": 0.0,
+        "coverage": {
+          "glossed": 0,
+          "total": 6,
+          "ratio": 0.0
+        },
+        "literal": "[recipe] · [for] · [chocolate] · [cake] · [with] · [eggs]"
+      },
+      {
+        "query": "Melbourne Cricketers narrowly won the match",
+        "confidence": 0.0,
+        "coverage": {
+          "glossed": 0,
+          "total": 6,
+          "ratio": 0.0
+        },
+        "literal": "[Melbourne] · [Cricketers] · [narrowly] · [won] · [the] · [match]"
+      },
+      {
+        "query": "पाठशाळेत आज मोठी चाचणी घेतली",
+        "confidence": 0.2628,
+        "coverage": {
+          "glossed": 2,
+          "total": 5,
+          "ratio": 0.4
+        },
+        "literal": "[पाठशाळेत] · [आज] · ≈big · [चाचणी] · took (f.)"
+      },
+      {
+        "query": "Stock markets fell sharply after the announcement",
+        "confidence": 0.0,
+        "coverage": {
+          "glossed": 0,
+          "total": 7,
+          "ratio": 0.0
+        },
+        "literal": "[Stock] · [markets] · [fell] · [sharply] · [after] · [the] · [announcement]"
+      },
+      {
+        "query": "amchi mumbai local train chhan chhan dhotey",
+        "confidence": 0.0,
+        "coverage": {
+          "glossed": 0,
+          "total": 6,
+          "ratio": 0.0
+        },
+        "literal": "[amchi] · [mumbai] · [local] · [train] · [chhan] · [dhotey]"
+      },
+      {
+        "query": "quantum physics describes subatomic particles",
+        "confidence": 0.0,
+        "coverage": {
+          "glossed": 0,
+          "total": 5,
+          "ratio": 0.0
+        },
+        "literal": "[quantum] · [physics] · [describes] · [subatomic] · [particles]"
+      },
+      {
+        "query": "the mitochondria is the powerhouse of the cell",
+        "confidence": 0.0,
+        "coverage": {
+          "glossed": 0,
+          "total": 8,
+          "ratio": 0.0
+        },
+        "literal": "[the] · [mitochondria] · [is] · [the] · [powerhouse] · [of] · [the] · [cell]"
+      }
+    ],
+    "ood_metric_definition": "A false positive is the system claiming a non-dataset input IS a known proverb (match_type phonetic/semantic). Provisional compositional answers are counted separately and are not false positives."
   },
   "ood_rejection": {
     "rate_pct": 100.0,
@@ -114,39 +198,39 @@
   },
   "latency_ms": {
     "fuzzy": {
-      "mean_ms": 2.94,
-      "median_ms": 2.88,
-      "p95_ms": 5.06,
-      "p99_ms": 6.55,
-      "min_ms": 0.93,
-      "max_ms": 7.37,
+      "mean_ms": 5.43,
+      "median_ms": 5.8,
+      "p95_ms": 8.38,
+      "p99_ms": 8.69,
+      "min_ms": 2.28,
+      "max_ms": 9.04,
       "n": 60
     },
     "semantic": {
-      "mean_ms": 25.64,
-      "median_ms": 30.36,
-      "p95_ms": 34.23,
-      "p99_ms": 34.8,
-      "min_ms": 10.28,
-      "max_ms": 35.23,
+      "mean_ms": 25.67,
+      "median_ms": 25.56,
+      "p95_ms": 30.73,
+      "p99_ms": 32.42,
+      "min_ms": 17.71,
+      "max_ms": 32.83,
       "n": 60
     },
     "full_resolve": {
-      "mean_ms": 35.28,
-      "median_ms": 39.32,
-      "p95_ms": 46.98,
-      "p99_ms": 49.29,
-      "min_ms": 16.27,
-      "max_ms": 49.47,
+      "mean_ms": 33.89,
+      "median_ms": 35.23,
+      "p95_ms": 41.3,
+      "p99_ms": 43.22,
+      "min_ms": 18.35,
+      "max_ms": 43.57,
       "n": 60
     },
     "search_topk10": {
-      "mean_ms": 170.52,
-      "median_ms": 165.59,
-      "p95_ms": 205.54,
-      "p99_ms": 252.83,
-      "min_ms": 124.48,
-      "max_ms": 276.38,
+      "mean_ms": 38.08,
+      "median_ms": 37.98,
+      "p95_ms": 44.95,
+      "p99_ms": 51.07,
+      "min_ms": 29.39,
+      "max_ms": 53.85,
       "n": 60
     }
   },

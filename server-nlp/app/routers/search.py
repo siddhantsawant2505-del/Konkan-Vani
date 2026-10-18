@@ -21,6 +21,7 @@ if _SERVER_ROOT not in sys.path:
     sys.path.insert(0, _SERVER_ROOT)
 
 from app.core.query_pipeline import search_idioms, resolve_idiom
+from app.core.compose import compose_idiom_meaning
 from app.data_loader import store
 
 router = APIRouter(prefix="/api", tags=["Search & Browse"])
@@ -51,10 +52,30 @@ class SearchResultOut(BaseModel):
     matched_on: str
 
 
+class ProvisionalOut(BaseModel):
+    """Word-by-word reading of an idiom that is not in the corpus."""
+    provisional: bool
+    match_type: str
+    confidence: float
+    literal_meaning: str
+    english_meaning: str
+    figurative_meaning: str
+    marathi_meaning: str
+    coverage: dict
+    themes: list[str]
+    negated: bool
+    word_glosses: list[dict]
+    closest_known: list[dict]
+    notes: list[str]
+
+
 class SearchResponseOut(BaseModel):
     query: str
     results: list[SearchResultOut]
     total: int
+    # Populated only when nothing in the corpus matched, so the client can
+    # explain the proverb word by word instead of showing "not found".
+    provisional: ProvisionalOut | None = None
 
 
 class BrowseResponseOut(BaseModel):
@@ -168,10 +189,31 @@ def search(q: str = Query(..., description="Search query (Devanagari Konkani)"),
             matched_on=r.get("matched_on", "unknown"),
         ))
 
+    provisional = None
+    if not results:
+        composed = compose_idiom_meaning(q)
+        if composed is not None:
+            provisional = ProvisionalOut(
+                provisional=True,
+                match_type=composed.get("match_type", "compositional"),
+                confidence=float(composed.get("confidence", 0.0)),
+                literal_meaning=composed.get("literal_meaning", ""),
+                english_meaning=composed.get("english_meaning", ""),
+                figurative_meaning=composed.get("figurative_meaning", ""),
+                marathi_meaning=composed.get("marathi_meaning", ""),
+                coverage=composed.get("coverage", {}),
+                themes=composed.get("themes", []),
+                negated=bool(composed.get("negated")),
+                word_glosses=composed.get("word_glosses", []),
+                closest_known=composed.get("closest_known", []),
+                notes=composed.get("notes", []),
+            )
+
     return SearchResponseOut(
         query=q,
         results=results,
         total=len(results),
+        provisional=provisional,
     )
 
 

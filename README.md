@@ -48,9 +48,10 @@ The platform operates on a decoupled client-server model with a multi-stage NLP 
         │ Stage 1                        │ Stage 2                        │ Stage 3
         ▼                                ▼                                ▼
 ┌───────────────┐               ┌─────────────────┐             ┌──────────────────┐
-│  Fuzzy Match  │               │ Vector Semantic │             │ Dynamic Fallback │
-│  (RapidFuzz)  │ ──── Fail ──► │  (LaBSE + FAISS │ ── Fail ──► │  AI Resolution   │
-│ Phonetic Keys │               │ Cosine Sim ≥0.55│             │  Generator Engine│
+│  Fuzzy Match  │               │ Vector Semantic │             │  Compositional   │
+│  (RapidFuzz)  │ ──── Fail ──► │  (LaBSE + FAISS │ ── Fail ──► │  Word-by-Word    │
+│ Phonetic Keys │               │ Cos ≥0.63 +     │             │  Meaning Fallback│
+│               │               │ overlap ≥0.34   │             │  (provisional)   │
 └───────────────┘               └─────────────────┘             └──────────────────┘
 ```
 
@@ -63,13 +64,29 @@ The platform operates on a decoupled client-server model with a multi-stage NLP 
    - Execution time: **~1ms to 3ms**.
 
 2. **Stage 2 — Multilingual Vector Semantic Search (`SentenceTransformer` + `FAISS`)**:
-   - Uses `sentence-transformers/LaBSE` (Language-Agnostic BERT Sentence Embeddings) to project queries into a 768-dimensional space.
+   - Uses the fine-tuned encoder `models/konkan-vani-encoder-v1` (a LaBSE family model) to project queries into a 768-dimensional space.
    - Evaluates cosine similarity against the pre-indexed 5,200 vectors in FAISS (`IndexFlatIP`).
-   - Cutoff threshold: **0.55** cosine similarity.
-   - Execution time: **~15ms to 25ms**.
+   - Cutoff threshold: **0.63** cosine similarity, plus a lexical-overlap guard
+     (≥34% of the query's content words must appear in the candidate) so a
+     topically similar but different proverb is not returned as the answer.
+   - Execution time: **~25ms**.
 
-3. **Stage 3 — Dynamic Fallback Generator**:
-   - Handles unindexed queries and provides fallback explanations if neither Stage 1 nor Stage 2 passes confidence thresholds.
+3. **Stage 3 — Compositional Fallback (`app/core/compose.py`)**:
+   - Replaces the old empty "not found" screen for proverbs outside the corpus.
+   - Glosses every word from `data/lexicon/konkani_lexicon.csv` through a
+     lookup ladder: exact headword → inflected stem → phonetic key → romanised
+     spelling variant → approximate cross-lingual gloss (Devanagari only).
+   - Composes a *provisional* reading: literal gloss sequence, action word
+     (Konkani perfective compounds merged), imagery theme, negation and
+     reduplication cues, plus how many words were recognised.
+   - Never invents a gloss for a word it cannot resolve, and labels the answer
+     as provisional on screen.
+   - Execution time: **~5ms to 30ms** (extra time only on the words that need
+     the encoder).
+
+4. **Optional Stage 4 — Dynamic AI Fallback (`dynamic_fallback.py`)**:
+   - Opt-in via `DYNAMIC_FALLBACK_ENABLED=1` + `GEMINI_API_KEY`; disabled by
+     default because it can fabricate answers for proverbs it has never seen.
 
 ---
 
@@ -125,9 +142,12 @@ Konkan-Vani/
 │   │   ├── main.py               # Uvicorn entry point & CORS configuration
 │   │   ├── data_loader.py        # IdiomStore loader (CSV + npy embeddings + FAISS index)
 │   │   ├── core/
-│   │   │   ├── query_pipeline.py # 3-Stage Resolver Engine (Fuzzy -> Semantic -> Fallback)
+│   │   │   ├── query_pipeline.py # 3-Stage Resolver Engine (Fuzzy -> Semantic -> Compositional)
 │   │   │   ├── phonetic_normalize.py # Devanagari & Romanized phonetic key cleaner
-│   │   │   └── dynamic_fallback.py  # Optional fallback response generator
+│   │   │   ├── lexicon.py        # Word glossary lookup (exact/stem/phonetic/fuzzy/approx)
+│   │   │   ├── compose.py        # Composes a provisional meaning for unknown proverbs
+│   │   │   ├── word_analysis.py  # Per-word vocabulary analysis attached to every response
+│   │   │   └── dynamic_fallback.py  # Optional LLM fallback (opt-in, disabled by default)
 │   │   └── routers/
 │   │       ├── health.py         # GET /health healthcheck endpoint
 │   │       ├── resolve.py        # POST /api/resolve low-level resolution endpoint
@@ -142,6 +162,8 @@ Konkan-Vani/
 │   └── requirements.txt          # Server-specific dependencies
 ├── data/                         # Datasets & Generated Vector Indexes (git-ignored / generated)
 │   ├── idiom_embeddings.npy      # Precomputed LaBSE dense embeddings (5200 x 768)
+│   ├── lexicon/
+│   │   └── konkani_lexicon.csv   # 376-entry Konkani -> English/Marathi word glossary
 │   └── processed/
 │       ├── idioms_with_phonetic_keys.csv  # Scaled 5,200 gold dataset
 │       └── index/
@@ -149,6 +171,9 @@ Konkan-Vani/
 │           └── konkani_meta.json # Parallel metadata store
 └── src/                          # Data Preparation & Indexing Scripts
     ├── rebuild_dataset.py        # Self-contained builder for the 5,200 gold dataset
+    ├── build_lexicon.py          # Builds the word glossary used by the fallback
+    ├── calibrate_lexicon.py      # Measures the approximate-gloss threshold
+    ├── make_composition_assets.py# Figures/table for the word-by-word fallback
     ├── build_index.py            # Compiles FAISS vector index from embeddings & CSV
     ├── scale_dataset.py          # Data scaling & translation augmentation script
     ├── audit_data.py             # Data integrity auditor (duplicate & missing checks)

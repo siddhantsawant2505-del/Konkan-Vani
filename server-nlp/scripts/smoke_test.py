@@ -7,10 +7,11 @@ Covers:
   2. Exact curated idiom            -> matched: true (phonetic)
   3. Misspelled variant             -> matched: true (phonetic)
   4. User-contributed idiom (Devanagari + Romanized) -> matched: true
-  5. Idiom fragment                 -> word_level analysis (not a full match)
-  6. Unrelated sentences            -> matched: false (no fabrication;
-                                       regression guard for the 0.55-era
-                                       false positives found in diagnostics)
+  5. Idiom fragment                 -> resolves to the parent idiom
+  6. Non-dataset sentences          -> a PROVISIONAL word-by-word reading
+                                       (match_type="compositional"), never a
+                                       fabricated corpus match. This replaces
+                                       the old matched:false contract.
 
 Usage:
     python -X utf8 server-nlp/scripts/smoke_test.py [base_url]
@@ -88,23 +89,26 @@ r = post("/api/resolve", {"text": USER_IDIOM_ROM})
 print("\nPOST", json.dumps(USER_IDIOM_ROM), "->", json.dumps(r, ensure_ascii=False))
 check("user idiom (Romanized) matched=true", r.get("matched") is True, str(r.get("match_type")))
 
-# 5. Fragment -> word_level (partial understanding, clearly labeled)
+# 5. Fragment -> resolves to the parent idiom (shares its content words)
 r = post("/api/resolve", {"text": FRAGMENT_QUERY})
 print("\nPOST", FRAGMENT_QUERY, "->", json.dumps(r, ensure_ascii=False))
-check("fragment -> word_level", r.get("matched") is True and r.get("match_type") == "word_level",
+check("fragment resolves to a corpus idiom",
+      r.get("matched") is True and r.get("match_type") in {"phonetic", "semantic"},
       str(r.get("match_type")))
-check("fragment word_analysis has 2 words",
-      r.get("match_type") == "word_level" and len(r.get("word_analysis") or []) == 2)
+check("fragment word_analysis has 2 words", len(r.get("word_analysis") or []) == 2)
 
-# 6. Negatives / regression guards
-r = post("/api/resolve", {"text": NEGATIVE_QUERY})
-print("\nPOST", json.dumps(NEGATIVE_QUERY), "->", json.dumps(r, ensure_ascii=False))
-check("negative matched=false", r.get("matched") is False)
-
-r = post("/api/resolve", {"text": FALSE_POS_REGRESSION})
-print("\nPOST", FALSE_POS_REGRESSION, "->", json.dumps(r, ensure_ascii=False))
-check("false-positive regression: matched=false", r.get("matched") is False,
-      f"match_type={r.get('match_type')}")
+# 6. Non-dataset sentences -> provisional reading, never a fabricated match
+for query, label in ((NEGATIVE_QUERY, "negative"),
+                     (FALSE_POS_REGRESSION, "false-positive regression")):
+    r = post("/api/resolve", {"text": query})
+    print("\nPOST", json.dumps(query), "->", json.dumps(r, ensure_ascii=False)[:400])
+    check(f"{label}: provisional reading, not a corpus match",
+          r.get("matched") is True
+          and r.get("match_type") == "compositional"
+          and r.get("provisional") is True,
+          f"match_type={r.get('match_type')}")
+    check(f"{label}: words were glossed or explicitly unknown",
+          isinstance(r.get("word_glosses"), list) and len(r.get("word_glosses") or []) > 0)
 
 print("\n" + "=" * 50)
 if failures:
