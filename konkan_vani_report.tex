@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage{float}
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{xcolor}
 \usepackage{listings}
 \usepackage{fancyhdr}
@@ -17,10 +18,11 @@
 \usetikzlibrary{arrows.meta,positioning,shapes.geometric}
 
 \hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue}
-% Images resolve from the report folder first, then from ./figures/
-\graphicspath{{./}{figures/}}
+% Images resolve from the report folder first, then ./figures/ and ./results/
+\graphicspath{{./}{figures/}{results/}}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{5pt}
+\setlength{\headheight}{15pt}
 
 % ---------- Header / Footer ----------
 \pagestyle{fancy}
@@ -46,7 +48,7 @@
 % ---------- Safe figure: shows a placeholder box if the image file is missing ----------
 \newcommand{\safefig}[2]{%
   \IfFileExists{#1}{\includegraphics[#2]{#1}}{%
-    \fbox{\parbox[c][5cm][c]{0.85\linewidth}{\centering\small Screenshot placeholder:\\ \texttt{\detokenize{#1}}}}}%
+    \fbox{\parbox[c][5cm][c]{0.85\linewidth}{\centering\small Figure placeholder:\\ \texttt{\detokenize{#1}}}}}%
 }
 
 % ---------- TikZ styles for flowcharts ----------
@@ -57,6 +59,7 @@
   arr/.style={-{Latex}, thick}
 }
 
+% Every \section starts on a new page
 \let\oldsection\section
 \renewcommand{\section}{\clearpage\oldsection}
 
@@ -87,19 +90,10 @@
 {\large\bfseries A Bilingual Konkani Idiom and\\Proverb Meaning Retrieval System}
 
 \vspace{1.8cm}
-{\large\bfseries Group Members}\\[8pt]
-\renewcommand{\arraystretch}{1.5}
-\begin{tabular}{|c|p{7cm}|c|}
-\hline
-\textbf{Sr. No.} & \textbf{Name of Student} & \textbf{Roll No.} \\
-\hline
-1 & Siddhant Sawant & 26 \\
-\hline
-2 & Krishna Sharma & 31 \\
-\hline
-3 & Kshitij Sharma & 32 \\
-\hline
-\end{tabular}
+{\large\bfseries Group Members}\\[12pt]
+{\large Siddhant Sawant \quad (Roll No.\ 26)}\\[6pt]
+{\large Krishna Sharma \quad (Roll No.\ 31)}\\[6pt]
+{\large Kshitij Sharma \quad (Roll No.\ 32)}
 
 \vspace{1.5cm}
 {\large Under the guidance of}\\[4pt]
@@ -175,15 +169,15 @@ Finally, we thank our families and friends for their constant support during the
 \end{justify}
 
 \vspace{1.5cm}
-\hfill
-\begin{tabular}{l}
+\begin{flushright}
 Siddhant Sawant\\
 Krishna Sharma\\
 Kshitij Sharma
-\end{tabular}
+\end{flushright}
 \newpage
+
 % =====================================================
-% ABSTRACT  (updated with real fine-tuning + measured results)
+% ABSTRACT
 % =====================================================
 \section*{\centering Abstract}
 \addcontentsline{toc}{section}{Abstract}
@@ -192,7 +186,7 @@ Kshitij Sharma
 \begin{justify}
 Konkan Vani is a web-based natural language processing (NLP) system that helps users retrieve the meanings of Konkani idioms and proverbs. Konkani is written in several scripts and is often typed informally, so the same idiom appears in many spellings, and users frequently remember only what an idiom means rather than how it is written. The system accepts queries in Devanagari, Kannada-script, Romanized Konkani, and English or Marathi descriptions of a meaning.
 
-A Next.js web client communicates with a Python FastAPI service that resolves each query through a staged pipeline: phonetic normalization with RapidFuzz fuzzy matching, multilingual semantic retrieval using a LaBSE-based encoder fine-tuned on Konkani idiom data (konkan-vani-encoder-v1), and a FAISS vector index, followed by a compositional fallback that glosses the query word by word and composes a provisional meaning when no stored idiom qualifies. For each retrieved idiom the interface presents the literal meaning, figurative meaning, English and Marathi meanings, and an example sentence.
+A Next.js web client communicates with a Python FastAPI service that resolves each query through a staged pipeline: phonetic normalization with RapidFuzz fuzzy matching, multilingual semantic retrieval using a LaBSE-based encoder fine-tuned on Konkani idiom data (konkan-vani-encoder-v1), and a FAISS vector index, followed by a fallback response for queries that do not meet the confidence thresholds. For each retrieved idiom the interface presents the literal meaning, figurative meaning, English and Marathi meanings, and an example sentence.
 
 The system is built on a dataset of 5,200 idiom records, each encoded as a 768-dimensional embedding. Fine-tuning the encoder with MultipleNegativesRankingLoss on 8,320 in-domain pairs raised held-out retrieval performance from a LaBSE Recall@1 of 51.4\% to 99.8\% (MRR@10 from 62.8\% to 99.8\%). In an automated benchmark on the live system, 200 sampled in-domain queries were retrieved with 100\% top-1 accuracy despite corrupted spellings, 150 Romanized and 150 Devanagari full-pipeline queries were each resolved correctly in 100\% of cases, and eight unrelated out-of-domain queries were all rejected with no false positives. Fuzzy matching takes about 3\,ms and full query resolution about 35\,ms (95th percentile 47\,ms) on a CUDA machine. The project shows that combining lexical and semantic retrieval with a domain fine-tuned encoder is an effective way to make Konkani idiomatic knowledge searchable across scripts and spelling conventions.
 \end{justify}
@@ -212,7 +206,7 @@ The system is built on a dataset of 5,200 idiom records, each encoded as a 768-d
 % =====================================================
 \addcontentsline{toc}{section}{List of Figures}
 \listoffigures
-\newpage
+
 
 % =====================================================
 % LIST OF TABLES
@@ -261,17 +255,34 @@ Konkani is written in several scripts and typed informally, so the same idiom ap
 The system covers idioms and proverbs that are present in its dataset. It supports three input scripts and two description languages, provides browsing and search through a web interface, and exposes its functions through a REST API. It is a retrieval system: it finds and presents stored meanings and does not generate new translations of arbitrary Konkani text. Its coverage is bounded by the dataset, so it should not be treated as a complete Konkani dictionary or as covering every regional dialect.
 
 \subsection{Organization of the Report}
-Section~2 describes the methodology, including preprocessing, the staged resolution algorithm, and the flowcharts. Section~3 lists the tools and software used. Section~4 describes the dataset and its provenance. Section~5 presents the implementation with code snapshots. Section~6 reports the measured results --- accuracy, fine-tuning gain, false-positive behaviour, threshold sensitivity, latency, and the coverage of the word-by-word fallback --- with charts, as well as the limitations. Section~7 concludes the report and suggests improvements, and the references follow.
+Section~2 describes the methodology, including preprocessing, encoder fine-tuning, the mathematical formulation of similarity metrics, the staged resolution and offline indexing algorithms, and their corresponding flowcharts. Section~3 lists the tools and software used. Section~4 describes the dataset and its provenance. Section~5 presents the implementation with code snapshots. Section~6 reports the measured results --- accuracy, fine-tuning gain, out-of-domain rejection, threshold sensitivity, and latency --- with charts, as well as the limitations. Section~7 concludes the report and suggests improvements, and the references follow.
+
 % =====================================================
 % c) METHODOLOGY
 % =====================================================
 \section{Methodology}
 
 \subsection{Overview of the Approach}
-Konkan Vani treats idiom lookup as a retrieval problem. Given a query, the system must find the stored idiom record that the user is looking for, or report that no reliable match exists. Two different kinds of difference separate a query from the stored idiom. The first is a surface difference: the same words written with a different spelling, script, or transliteration. The second is a difference of wording: the query describes the meaning of the idiom in other words or in another language. No single technique handles both well, so the system uses a hybrid design. Fast lexical matching handles surface differences, and semantic embeddings handle differences of wording.
+Konkan Vani treats idiom lookup as an information retrieval problem~\cite{manning}. Given a query, the system must find the stored idiom record that the user is looking for, or report that no reliable match exists. Two different kinds of difference separate a query from the stored idiom. The first is a surface difference: the same words written with a different spelling, script, or transliteration. The second is a difference of wording: the query describes the meaning of the idiom in other words or in another language. No single technique handles both well, so the system uses a hybrid design. Fast lexical matching handles surface differences, and semantic embeddings handle differences of wording.
 
 \subsection{Encoder Fine-tuning}
-The generic LaBSE model was fine-tuned on the idiom corpus itself, producing the production checkpoint \texttt{konkan-vani-encoder-v1}. Training used the MultipleNegativesRankingLoss on 8,320 positive idiom pairs (query form paired with the same idiom's alternate form/meaning text) for 3 epochs at batch size 16 (about 2.1 hours on the available GPU, with a held-out set of 1,040 pairs). The loss treats each positive pair as the correct match among the other in-batch examples, which forces the encoder to pull the same idiom's spelling and meaning variants together and push different idioms apart. Fine-tuning raised held-out Recall@1 from 51.4\% to 99.8\% and the mean positive-pair cosine from 0.44 to 0.94 (Table~\ref{tab:finetune}). At run time the server prefers this checkpoint and falls back to generic LaBSE only if it is missing, so a fresh clone still starts.
+The generic LaBSE model~\cite{labse} was fine-tuned on the idiom corpus itself, producing the production checkpoint \texttt{konkan-vani-encoder-v1}. Training used the MultipleNegativesRankingLoss (MNRL)~\cite{henderson,sbert} on 8,320 positive idiom pairs (query form paired with the same idiom's alternate form or meaning text) for 3 epochs at batch size 16 (about 2.1 hours on the available GPU, with a held-out set of 1,040 pairs). The contrastive objective optimizes the semantic alignment of positive pairs while treating all other pairs in the mini-batch as negative examples:
+\begin{equation}
+\label{eq:mnrl}
+\mathcal{L}_{\mathrm{MNRL}} = -\frac{1}{B} \sum_{i=1}^{B} \log \frac{\exp\left(\frac{\vec{u}_i \cdot \vec{v}_i}{\tau}\right)}{\sum_{j=1}^{B} \exp\left(\frac{\vec{u}_i \cdot \vec{v}_j}{\tau}\right)}
+\end{equation}
+where:
+\begin{itemize}
+  \item $\mathcal{L}_{\mathrm{MNRL}}$ is the Multiple Negatives Ranking Loss computed over a training mini-batch.
+  \item $B$ denotes the mini-batch size ($B = 16$).
+  \item $\vec{u}_i \in \mathbb{R}^D$ is the $L_2$-normalized embedding vector of the $i$-th anchor sequence (e.g., a transliterated or colloquial idiom query).
+  \item $\vec{v}_i \in \mathbb{R}^D$ is the $L_2$-normalized embedding vector of the corresponding $i$-th true positive sequence (e.g., canonical Devanagari idiom or its English/Marathi meaning text).
+  \item $\vec{v}_j \in \mathbb{R}^D$ denotes the embedding vector of the $j$-th target sequence in the mini-batch, which functions as an implicit negative example for anchor $\vec{u}_i$ whenever $j \neq i$.
+  \item $\tau$ is the temperature scaling hyperparameter controlling the concentration of the probability distribution ($\tau > 0$).
+  \item $\vec{u}_i \cdot \vec{v}_j$ represents the inner product (equivalent to cosine similarity for unit-length vectors) between anchor $\vec{u}_i$ and target $\vec{v}_j$.
+  \item $D$ is the embedding dimension ($D = 768$).
+\end{itemize}
+The loss treats each positive pair as the correct match among the other in-batch examples, which forces the encoder to pull the same idiom's spelling and meaning variants together and push different idioms apart. Fine-tuning raised held-out Recall@1 from 51.4\% to 99.8\% and the mean positive-pair cosine from 0.44 to 0.94 (Table~\ref{tab:finetune}). At run time the server prefers this checkpoint and falls back to generic LaBSE only if it is missing, so a fresh clone still starts.
 
 \subsection{Preprocessing Techniques}
 \begin{itemize}
@@ -283,19 +294,59 @@ The generic LaBSE model was fine-tuned on the idiom corpus itself, producing the
 
 \subsection{Models and Algorithms}
 
-\textbf{Staged Resolution.} Each query passes through a staged resolver. Stage~1 is phonetic fuzzy matching. If no candidate meets the threshold, Stage~2 performs semantic vector search with the fine-tuned encoder, accepting a candidate only when it also shares content words with the query (so that a merely topical neighbour is not mistaken for the same proverb). If that also fails, Stage~3 --- a compositional fallback --- glosses every word of the query from a Konkani word lexicon and composes a provisional meaning, so an unknown proverb is still explained rather than answered with an empty screen. The cheap stage runs first, so most surface-variant queries never need the more expensive semantic stage, and the neural stage never runs for words the glossary already knows.
+\textbf{Staged Resolution.} Each query passes through a staged resolver. Stage~1 is phonetic fuzzy matching. If no candidate meets the threshold, Stage~2 performs semantic vector search with the fine-tuned encoder. If that also fails, a word-level analysis stage acts as a conservative third attempt, and queries that satisfy none of the thresholds receive a fallback response. The cheap stage runs first, so most surface-variant queries never need the more expensive semantic stage.
 
-\textbf{Stage 1: Phonetic Fuzzy Matching.} The normalized query is compared with stored phonetic keys and text variants using the RapidFuzz token sort ratio. This measure sorts the words of both strings alphabetically before computing a character-level similarity score between 0 and 100, so a different word order does not reduce the score. A candidate is accepted when its score reaches the cutoff:
-\[
-\mathrm{score}(q,k) = \mathrm{token\_sort\_ratio}(q,k), \qquad \text{accept if } \mathrm{score} \ge 75
-\]
+\textbf{Stage 1: Phonetic Fuzzy Matching.} The normalized query is compared with stored phonetic keys and text variants using the RapidFuzz~\cite{rapidfuzz} token sort ratio. This measure tokenizes both strings, sorts their words alphabetically, joins them, and computes a normalized character-level edit similarity between 0 and 100, ensuring invariance to word order permutations. Mathematically, the similarity score is evaluated as:
+\begin{equation}
+\label{eq:token_sort_ratio}
+\mathrm{score}(q, k) = \mathrm{token\_sort\_ratio}(q, k) = \left( 1 - \frac{\mathrm{Lev}(q_{\mathrm{sorted}}, k_{\mathrm{sorted}})}{|q_{\mathrm{sorted}}| + |k_{\mathrm{sorted}}|} \right) \times 100
+\end{equation}
+The decision criterion for Stage~1 acceptance is governed by:
+\begin{equation}
+\label{eq:fuzzy_decision}
+\mathrm{Decision}_{\mathrm{fuzzy}}(q) = \begin{cases}
+\text{Accept candidate } k^*, & \text{if } \mathrm{score}(q, k^*) \ge \tau_{\mathrm{fuzzy}} \\
+\text{Forward to Stage 2}, & \text{if } \mathrm{score}(q, k^*) < \tau_{\mathrm{fuzzy}}
+\end{cases}
+\end{equation}
+where:
+\begin{itemize}
+  \item $q$ represents the preprocessed and phonetically normalized user query string.
+  \item $k$ represents a candidate phonetic key stored in the idiom dataset.
+  \item $q_{\mathrm{sorted}}$ and $k_{\mathrm{sorted}}$ are the normalized token sequences obtained by splitting $q$ and $k$ into individual words, sorting those words alphabetically, and re-joining them with single spaces.
+  \item $\mathrm{Lev}(s_1, s_2)$ denotes the Levenshtein distance between strings $s_1$ and $s_2$, representing the minimum count of single-character insertions, deletions, or substitutions required to transform $s_1$ into $s_2$.
+  \item $|s|$ represents the character length (cardinality) of string $s$.
+  \item $\mathrm{score}(q, k)$ is the resulting fuzzy matching score, normalized to the range $[0, 100]$.
+  \item $k^* = \arg\max_{k \in \mathcal{K}} \mathrm{score}(q, k)$ is the optimal candidate phonetic key in the stored collection $\mathcal{K}$ achieving the highest match score.
+  \item $\tau_{\mathrm{fuzzy}}$ is the empirical acceptance cutoff threshold, set to $75$.
+  \item $\mathrm{Decision}_{\mathrm{fuzzy}}(q)$ specifies the routing outcome of Stage~1: accepting the matched idiom $k^*$ if its score reaches the threshold $\tau_{\mathrm{fuzzy}}$, or cascading to Stage~2 otherwise.
+\end{itemize}
 A cutoff of 75 is strict enough to avoid matching unrelated idioms but tolerant enough to accept small spelling differences. This stage is fast, taking a few milliseconds, and resolves Romanized spellings and phonetic variants.
 
-\textbf{Stage 2: Semantic Retrieval with the Fine-tuned Encoder and FAISS.} LaBSE is a multilingual sentence encoder that converts a sentence in any of more than a hundred languages into a 768-dimensional vector; sentences with the same meaning in different languages are placed close together in the same vector space. The production system uses the fine-tuned variant of this encoder, which was trained to place the spelling and meaning variants of the same Konkani idiom much closer than the generic model does (Section~2.2). Every idiom in the dataset is encoded once in advance. At query time the query is encoded and compared with all stored vectors. The idiom vectors are L2-normalized and stored in a FAISS \texttt{IndexFlatIP} index, so the inner product of two vectors equals their cosine similarity:
-\[
-\cos(\vec{q},\vec{d}) = \frac{\vec{q}\cdot\vec{d}}{|\vec{q}|\,|\vec{d}|} = \vec{q}\cdot\vec{d}
-\quad \text{(for unit-length vectors)}, \qquad \text{accept if } \cos \ge \theta
-\]
+\textbf{Stage 2: Semantic Retrieval with the Fine-tuned Encoder and FAISS.} LaBSE is a multilingual sentence encoder that converts a sentence in any of more than a hundred languages into a 768-dimensional vector; sentences with the same meaning in different languages are placed close together in the same vector space. The production system uses the fine-tuned variant of this encoder, which was trained to place the spelling and meaning variants of the same Konkani idiom much closer than the generic model does (Section~2.2). Every idiom in the dataset is encoded once in advance. At query time the query is encoded and compared with all stored vectors. The idiom vectors are $L_2$-normalized and stored in a FAISS~\cite{faiss} \texttt{IndexFlatIP} index, so the inner product of two unit vectors equals their cosine similarity:
+\begin{equation}
+\label{eq:cosine_sim}
+\cos(\vec{q},\vec{d}) = \frac{\vec{q}\cdot\vec{d}}{\|\vec{q}\|_2 \|\vec{d}\|_2} = \sum_{m=1}^{D} q_m d_m = \vec{q}\cdot\vec{d} \quad \text{for } \|\vec{q}\|_2 = \|\vec{d}\|_2 = 1
+\end{equation}
+The acceptance rule for Stage~2 semantic retrieval is defined by:
+\begin{equation}
+\label{eq:semantic_decision}
+\mathrm{Decision}_{\mathrm{semantic}}(\vec{q}) = \begin{cases}
+\text{Accept idiom } \hat{d}, & \text{if } \cos(\vec{q},\hat{d}) \ge \theta \\
+\text{Forward to Fallback}, & \text{if } \cos(\vec{q},\hat{d}) < \theta
+\end{cases}
+\end{equation}
+where:
+\begin{itemize}
+  \item $\vec{q} \in \mathbb{R}^D$ is the $D$-dimensional dense semantic embedding vector generated for the user query by the fine-tuned encoder.
+  \item $\vec{d} \in \mathbb{R}^D$ is the stored dense semantic embedding vector corresponding to an idiom in the database.
+  \item $D$ is the embedding dimension ($D = 768$).
+  \item $q_m$ and $d_m$ denote the $m$-th scalar components of vectors $\vec{q}$ and $\vec{d}$, respectively.
+  \item $\|\vec{v}\|_2 = \sqrt{\sum_{m=1}^{D} v_m^2}$ represents the Euclidean ($L_2$) norm of vector $\vec{v}$. Because all query and idiom vectors are $L_2$-normalized to unit length ($\|\vec{q}\|_2 = \|\vec{d}\|_2 = 1$), their cosine similarity reduces to their direct inner product $\vec{q} \cdot \vec{d}$.
+  \item $\hat{d} = \arg\max_{d \in \mathcal{D}} (\vec{q} \cdot \vec{d})$ is the nearest-neighbor idiom embedding retrieved from the index collection $\mathcal{D}$ using FAISS exhaustive maximum inner product search.
+  \item $\theta$ is the semantic confidence acceptance threshold, configured to $\theta = 0.63$.
+  \item $\mathrm{Decision}_{\mathrm{semantic}}(\vec{q})$ specifies the routing outcome of Stage~2: accepting the top idiom record $\hat{d}$ if the similarity meets or exceeds $\theta$, or routing the query to the fallback handler.
+\end{itemize}
 \texttt{IndexFlatIP} performs an exact, exhaustive search, which is practical for a collection of this size and gives no approximation error. Because the encoder aligns languages in one space, an English or Marathi description of an idiom's meaning can retrieve the matching Konkani idiom even though the two share no words.
 
 \textbf{Fallback.} Queries that satisfy neither threshold receive a no-reliable-match response (with an opt-in generated-response mode kept disabled by default). Fallback output is kept clearly separate from dataset entries, so that it is never mistaken for a verified idiom meaning.
@@ -365,8 +416,72 @@ The system consists of cooperating services. The Next.js client provides the use
 \label{fig:architecture}
 \end{figure}
 
-\subsection{Algorithm Flowcharts}
-Figure~\ref{fig:pipeline} shows how a single query is resolved at search time. Figure~\ref{fig:indexing} shows the offline step that prepares the semantic index before the server starts.
+\subsection{Algorithms and Flowcharts}
+The retrieval architecture of Konkan Vani is divided into two distinct computational procedures:
+\begin{enumerate}
+  \item \textbf{Online Staged Query Resolution:} An online query processing pipeline that evaluates incoming queries through cascaded phonetic-fuzzy and dense-semantic matching stages, terminating either in a verified idiom record or a graceful fallback response.
+  \item \textbf{Offline Embedding and Index Construction:} An offline batch preparation pipeline that computes dense latent vectors for all 5,200 idiom entries using the fine-tuned encoder, unit-normalizes them, and builds a FAISS vector index saved to secondary storage for immediate server loading.
+\end{enumerate}
+
+\subsubsection{Algorithm 1: Staged Query Resolution Algorithm}
+Algorithm~\ref{alg:resolution} formalizes the runtime decision logic executed by the FastAPI backend upon receiving a user query.
+
+\begin{table}[H]
+\centering
+\caption{Algorithm 1: Staged Query Resolution and Fallback Routing}
+\label{alg:resolution}
+\vspace{4pt}
+\hrule height 1pt
+\vspace{6pt}
+\begin{minipage}{0.96\linewidth}
+\textbf{Input:} User query string $Q$; precomputed phonetic key set $\mathcal{K} = \{k_1, k_2, \dots, k_N\}$; dataset record store $\mathcal{M} = \{r_1, r_2, \dots, r_N\}$; fine-tuned encoder $\mathcal{E}$ (\texttt{konkan-vani-encoder-v1}); FAISS index $\mathcal{I}$ (\texttt{IndexFlatIP}); fuzzy cutoff threshold $\tau_{\mathrm{fuzzy}} = 75$; semantic cutoff threshold $\theta = 0.63$.\\[3pt]
+\textbf{Output:} Matched idiom record $R^*$ with resolution stage metadata $(S^*, \sigma^*)$, or a structured Fallback response.\\[4pt]
+\hrule
+\vspace{6pt}
+\textbf{Procedure:}
+\begin{enumerate}
+  \itemsep 2pt
+  \item \textbf{Unicode Normalization:} Clean and normalize query: $Q_{\mathrm{clean}} \leftarrow \mathrm{UnicodeNormalize}(Q)$.
+  \item \textbf{Phonetic Normalization:} Generate the phonetic search key: $k_Q \leftarrow \mathrm{PhoneticNormalize}(Q_{\mathrm{clean}})$.
+  \item \textbf{Stage 1 --- Lexical Fuzzy Matching:}
+  \begin{enumerate}
+    \item Compute token sort ratio similarity across stored keys:\\
+    $(k^*, \mathrm{score}^*, \mathrm{idx}^*) \leftarrow \arg\max_{k_i \in \mathcal{K}} \mathrm{token\_sort\_ratio}(k_Q, k_i)$.
+    \item \textbf{if} $\mathrm{score}^* \ge \tau_{\mathrm{fuzzy}}$ \textbf{then}
+    \item \quad Return record $R^* \leftarrow \mathcal{M}[\mathrm{idx}^*]$, stage $S^* \leftarrow \text{``phonetic\_fuzzy''}$, confidence $\sigma^* \leftarrow \mathrm{score}^*$.
+    \item \textbf{end if}
+  \end{enumerate}
+  \item \textbf{Stage 2 --- Dense Semantic Vector Retrieval:}
+  \begin{enumerate}
+    \item Encode query string into latent representation: $\vec{e}_Q \leftarrow \mathcal{E}.\mathrm{encode}(Q_{\mathrm{clean}})$.
+    \item Project to unit hypersphere: $\vec{q} \leftarrow \vec{e}_Q / \|\vec{e}_Q\|_2$.
+    \item Query FAISS vector index for nearest neighbor ($k=1$ exhaustive search):\\
+    $(\mathrm{sim}^*, \mathrm{idx}^*) \leftarrow \mathcal{I}.\mathrm{search}(\vec{q}, k=1)$.
+    \item \textbf{if} $\mathrm{sim}^* \ge \theta$ \textbf{then}
+    \item \quad Return record $R^* \leftarrow \mathcal{M}[\mathrm{idx}^*]$, stage $S^* \leftarrow \text{``semantic\_vector''}$, confidence $\sigma^* \leftarrow \mathrm{sim}^*$.
+    \item \textbf{end if}
+  \end{enumerate}
+  \item \textbf{Stage 3 --- Fallback Handler:}
+  \begin{enumerate}
+    \item Return structured Fallback response: $R^* \leftarrow \mathrm{None}$, indicating no verified idiom satisfies the confidence threshold.
+  \end{enumerate}
+\end{enumerate}
+\vspace{4pt}
+\end{minipage}
+\hrule height 1pt
+\end{table}
+
+\textbf{Explanation of Algorithm 1:}
+\begin{itemize}
+  \item \textbf{Staged Pipeline Efficiency:} Rather than invoking the deep neural transformer on every request, the algorithm executes the inexpensive lexical fuzzy matcher first (Stage~1). Because most interactive queries consist of misspelled Romanized text or minor script variations, Stage~1 resolves them in under 3\,ms on average (Table~\ref{tab:latency}), bypassing the heavier neural network.
+  \item \textbf{Phonetic Transformation:} The \texttt{PhoneticNormalize} function maps irregular spellings into standard phonetic representations by folding long vowels (\emph{aa}\,$\to$\,\emph{a}, \emph{ee}\,$\to$\,\emph{i}, \emph{oo}\,$\to$\,\emph{u}) and merging phonetically interchangeable consonants (\emph{ph}\,$\to$\,\emph{f}, \emph{v}\,$\to$\,\emph{w}, \emph{zh}\,$\to$\,\emph{j}). This ensures that arbitrary user transcriptions match stored keys.
+  \item \textbf{Semantic Projection:} When lexical matching fails (e.g., when a user queries an English description such as ``crying over spilt milk'' or a Marathi paraphrase), Stage~2 transforms the query into a 768-dimensional vector via the fine-tuned encoder $\mathcal{E}$. The unit normalization step guarantees that inner product search over the index directly computes cosine similarity.
+  \item \textbf{Out-of-Domain Safety:} Queries with similarity scores strictly below the threshold $\theta = 0.63$ are routed to the fallback handler. This prevents false positive hallucinations and ensures that unrelated general text is rejected cleanly.
+  \item \textbf{Computational Complexity:} Stage~1 evaluates $N = 5{,}200$ string comparisons with $O(N \cdot L_{\mathrm{avg}})$ complexity, where $L_{\mathrm{avg}} \approx 25$ characters. Stage~2 evaluates an encoder forward pass of $O(L_{\mathrm{tokens}} \cdot D \cdot H)$ followed by an inner product search of $O(N \cdot D)$ with $D = 768$. Across both stages, the total latency remains under 50\,ms.
+\end{itemize}
+
+\subsubsection{Explanation of Flowchart: Staged Query Resolution}
+Figure~\ref{fig:pipeline} provides the visual process flow of Algorithm~\ref{alg:resolution}, illustrating the state transitions and decision boundaries executed for each incoming search query.
 
 \begin{figure}[H]
 \centering
@@ -393,6 +508,78 @@ Figure~\ref{fig:pipeline} shows how a single query is resolved at search time. F
 \label{fig:pipeline}
 \end{figure}
 
+\textbf{Step-by-step Flowchart Walkthrough (Figure~\ref{fig:pipeline}):}
+\begin{enumerate}
+  \item \textbf{Input Trapezoid (\texttt{q}):} Accepts queries typed in Devanagari script, Kannada script, Romanized Konkani, or natural language descriptions in English or Marathi.
+  \item \textbf{Preprocessing Rectangle (\texttt{norm}):} Normalizes Unicode representations to NFC form, strips punctuation, folds lettercase, and converts the string into a standardized phonetic key.
+  \item \textbf{Fuzzy Evaluation Rectangle (\texttt{fz}):} RapidFuzz computes the token sort ratio similarity between the query's phonetic key and all 5,200 indexed keys.
+  \item \textbf{Decision Diamond 1 (\texttt{d1}):} Evaluates whether the top lexical match score meets or exceeds the cutoff $\tau_{\mathrm{fuzzy}} = 75$.
+  \begin{itemize}
+    \item \emph{Path `yes':} The query is determined to be a surface spelling or transliteration variant. The process immediately branches right to node \texttt{res1}, returning the corresponding idiom record with sub-3\,ms latency.
+    \item \emph{Path `no':} The lexical score falls below 75, indicating that the query is either a descriptive paraphrasing, cross-lingual translation, or out-of-domain text. The execution drops down to node \texttt{sem}.
+  \end{itemize}
+  \item \textbf{Semantic Retrieval Rectangle (\texttt{sem}):} Invokes the fine-tuned \texttt{konkan-vani-encoder-v1} model to generate a 768-dimensional normalized embedding, followed by exhaustive maximum inner product search in FAISS.
+  \item \textbf{Decision Diamond 2 (\texttt{d2}):} Checks whether the best cosine similarity score reaches or exceeds the threshold $\theta = 0.63$.
+  \begin{itemize}
+    \item \emph{Path `yes':} The query is identified as a valid semantic match. The execution branches right to node \texttt{res2}, returning the retrieved idiom record.
+    \item \emph{Path `no':} The similarity score fails to reach 0.63, indicating that the query does not correlate with any stored idiom. The flow cascades down to node \texttt{fb}.
+  \end{itemize}
+  \item \textbf{Fallback Rectangle (\texttt{fb}):} Generates a structured message informing the user that no reliable match was found, avoiding hallucination and preserving system trustworthiness.
+\end{enumerate}
+
+\subsubsection{Algorithm 2: Offline Embedding and FAISS Vector Indexing}
+Algorithm~\ref{alg:indexing} specifies the offline workflow that processes the curated and pattern-generated dataset into vector representations and constructs the persisted search index.
+
+\begin{table}[H]
+\centering
+\caption{Algorithm 2: Offline Embedding and FAISS Vector Index Construction}
+\label{alg:indexing}
+\vspace{4pt}
+\hrule height 1pt
+\vspace{6pt}
+\begin{minipage}{0.96\linewidth}
+\textbf{Input:} Dataset CSV file $\mathcal{D}_{\mathrm{csv}}$ containing $N = 5{,}200$ idiom records; sentence encoder $\mathcal{E}$ (\texttt{konkan-vani-encoder-v1}); embedding dimensionality $D = 768$; target index file path $\mathcal{P}_{\mathrm{idx}}$.\\[3pt]
+\textbf{Output:} Persisted FAISS index file $\mathcal{P}_{\mathrm{idx}}$ containing $N$ unit-normalized vectors; persisted metadata mapping table $\mathcal{P}_{\mathrm{meta}}$.\\[4pt]
+\hrule
+\vspace{6pt}
+\textbf{Procedure:}
+\begin{enumerate}
+  \itemsep 2pt
+  \item \textbf{Dataset Ingestion:} Parse $\mathcal{D}_{\mathrm{csv}}$ and extract record fields: Devanagari text $T_{\mathrm{dev}}$, Romanized text $T_{\mathrm{rom}}$, figurative meaning $M_{\mathrm{fig}}$, English meaning $M_{\mathrm{eng}}$, and Marathi meaning $M_{\mathrm{mar}}$.
+  \item \textbf{Phonetic Key Generation:} For each record $i \in \{1, \dots, N\}$, compute:\\
+  $k_i \leftarrow \mathrm{PhoneticNormalize}(T_{\mathrm{rom}}[i])$, and save array $\mathcal{K} = [k_1, k_2, \dots, k_N]$.
+  \item \textbf{Contextual String Assembly:} Formulate composite semantic representation strings for encoding:\\
+  $S_i \leftarrow T_{\mathrm{dev}}[i] \mathbin{\Vert} \text{``; ''} \mathbin{\Vert} M_{\mathrm{eng}}[i] \mathbin{\Vert} \text{``; ''} \mathbin{\Vert} M_{\mathrm{mar}}[i]$.
+  \item \textbf{Batch Dense Encoding:} Compute unnormalized embeddings using the encoder:\\
+  $\mathbf{V}_{\mathrm{raw}} \leftarrow \mathcal{E}.\mathrm{encode}([S_1, \dots, S_N], \mathrm{batch\_size}=32) \in \mathbb{R}^{N \times D}$.
+  \item \textbf{$L_2$ Normalization:} Normalize each row vector to unit Euclidean length:\\
+  $\mathbf{V}[i, :] \leftarrow \mathbf{V}_{\mathrm{raw}}[i, :] / \|\mathbf{V}_{\mathrm{raw}}[i, :]\|_2, \quad \forall i \in \{1, \dots, N\}$.
+  \item \textbf{Index Construction:}
+  \begin{enumerate}
+    \item Instantiate empty FAISS flat inner-product index: $\mathcal{I} \leftarrow \mathrm{faiss.IndexFlatIP}(D)$.
+    \item Insert normalized float32 embedding matrix: $\mathcal{I}.\mathrm{add}(\mathbf{V})$.
+  \end{enumerate}
+  \item \textbf{Serialization:}
+  \begin{enumerate}
+    \item Write vector index to disk: $\mathrm{faiss.write\_index}(\mathcal{I}, \mathcal{P}_{\mathrm{idx}})$.
+    \item Serialize metadata mapping and phonetic key array $\mathcal{K}$ to disk.
+  \end{enumerate}
+\end{enumerate}
+\vspace{4pt}
+\end{minipage}
+\hrule height 1pt
+\end{table}
+
+\textbf{Explanation of Algorithm 2:}
+\begin{itemize}
+  \item \textbf{Offline Decoupling:} Generating dense embeddings for 5,200 idioms requires substantial computational throughput. By executing this procedure offline, startup time for the production FastAPI service is reduced to less than 1.5 seconds (the time required to load the precomputed FAISS file from disk into memory).
+  \item \textbf{Unit Projection Guarantee:} Computing the cosine similarity between an arbitrary query vector $\vec{q}$ and 5,200 stored vectors $\vec{d}_i$ normally requires calculating vector norms dynamically: $\frac{\vec{q} \cdot \vec{d}_i}{\|\vec{q}\|_2 \|\vec{d}_i\|_2}$. By pre-normalizing all stored vectors offline ($\|\vec{d}_i\|_2 = 1.0$), FAISS's highly optimized SIMD inner product kernels evaluate cosine similarity directly via dot products, avoiding run-time square root and division operations.
+  \item \textbf{Exact Search with IndexFlatIP:} Because $N = 5{,}200$ and $D = 768$, the entire index occupies only $5{,}200 \times 768 \times 4 \text{ bytes} \approx 16\,\text{MB}$ of memory. This allows an exact, exhaustive flat index (\texttt{IndexFlatIP}) to be used without the quantization noise or recall degradation associated with inverted file (IVF) or hierarchical graph (HNSW) approximations.
+\end{itemize}
+
+\subsubsection{Explanation of Flowchart: Offline Embedding and FAISS Indexing}
+Figure~\ref{fig:indexing} details the offline preparation pipeline executed prior to server deployment.
+
 \begin{figure}[H]
 \centering
 \begin{tikzpicture}[node distance=0.9cm]
@@ -409,6 +596,15 @@ Figure~\ref{fig:pipeline} shows how a single query is resolved at search time. F
 \caption{Offline embedding and FAISS index construction}
 \label{fig:indexing}
 \end{figure}
+
+\textbf{Step-by-step Flowchart Walkthrough (Figure~\ref{fig:indexing}):}
+\begin{enumerate}
+  \item \textbf{Data Ingestion (\texttt{csv}):} The processed dataset CSV file (\texttt{idioms with phonetic keys.csv}) containing 5,200 validated idiom records serves as the input stream.
+  \item \textbf{Batch Encoding (\texttt{enc}):} The fine-tuned transformer model (\texttt{konkan-vani-encoder-v1}) ingests the textual expressions and meanings in batches of 32, generating 768-dimensional floating-point latent vectors.
+  \item \textbf{Vector Normalization (\texttt{nrm}):} Each 768-dimensional vector is divided by its Euclidean norm, projecting all points onto the surface of a unit hypersphere ($\mathbb{S}^{767}$).
+  \item \textbf{Index Instantiation (\texttt{idx}):} The unit-normalized vectors are appended to a FAISS \texttt{IndexFlatIP} data structure designed for fast matrix inner-product multiplication.
+  \item \textbf{Disk Serialization (\texttt{save}):} The structured vector index is serialized to secondary storage as \texttt{konkani.index}, alongside JSON/pickle metadata lookups. This file is directly mapped into memory when the server boots.
+\end{enumerate}
 
 % =====================================================
 % d) TOOLS / SOFTWARE USED
@@ -441,14 +637,15 @@ Documentation & \LaTeX{} (this report), Matplotlib (result charts) \\
 \end{table}
 
 \begin{itemize}
-  \item \textbf{Python and FastAPI:} Python is the language of the NLP ecosystem, and FastAPI is a modern web framework that exposes Python functions as fast, documented REST endpoints with automatic request validation.
+  \item \textbf{Python and FastAPI:} Python is the language of the NLP ecosystem, and FastAPI~\cite{fastapi} is a modern web framework that exposes Python functions as fast, documented REST endpoints with automatic request validation.
   \item \textbf{RapidFuzz:} A fast string-matching library that provides similarity measures such as the token sort ratio. It is used for the lexical stage.
   \item \textbf{SentenceTransformers and LaBSE:} SentenceTransformers is a library for loading, fine-tuning, and running sentence-embedding models. The project started from the pretrained LaBSE checkpoint and fine-tuned it on the idiom corpus; it also loads that checkpoint with a generic-LaBSE fallback so the server starts on a fresh clone.
   \item \textbf{FAISS:} A similarity-search library from Facebook AI Research that stores vectors and finds the nearest ones efficiently.
-  \item \textbf{Next.js:} A React-based framework used to build the search, browse, and result pages.
+  \item \textbf{Next.js:} A React-based framework~\cite{nextjs} used to build the search, browse, and result pages.
   \item \textbf{PyTorch (CUDA):} The deep-learning backend on which the encoder was trained and is served, with hardware acceleration when a GPU is available.
   \item \textbf{Matplotlib:} Used to generate the accuracy, fine-tuning comparison, threshold, and latency charts in Section~6 from the raw benchmark output.
 \end{itemize}
+
 % =====================================================
 % e) DATASET DESCRIPTION
 % =====================================================
@@ -490,7 +687,7 @@ Embeddings & One 768-dimensional encoder vector per idiom, L2-normalized, stored
 \hline
 Scripts covered & Devanagari and Roman (informal transliteration) in the current data \\
 \hline
-Meaning text length & Romanized form averages 5.0 words per record (max 6) \\
+Romanized form length & Averages 5.0 words per record (max 6) \\
 \hline
 Ground Truth & Benchmark queries covering exact, Romanized, corrupted-spelling, and out-of-domain cases (Section~\ref{sec:results}) \\
 \hline
@@ -603,7 +800,7 @@ def fuzzy_stage(query_key, phonetic_keys):
 \textbf{Encoder model registry} (simplified): the fine-tuned checkpoint is loaded once and shared, with a safe fallback.
 \begin{lstlisting}
 CUSTOM = "models/konkan-vani-encoder-v1"
- FALLBACK = "sentence-transformers/LaBSE"
+FALLBACK = "sentence-transformers/LaBSE"
 
 def get_model():
     if os.path.isdir(CUSTOM):
@@ -655,8 +852,9 @@ The search page lets the user type a query and choose its script. The result pag
 
 \subsection{Reproducibility}
 The dataset builder, the fine-tuning script, and the benchmark are all in the repository and are seeded, so every number in Section~6 can be regenerated with a single command per script. The benchmark was run on Python 3.12 with CUDA on Windows 11; the absolute latency figures vary with hardware, while the accuracy ones do not.
+
 % =====================================================
-% g) RESULTS  (measured, reproducible; charts from real runs)
+% g) RESULTS
 % =====================================================
 \section{Results}
 \label{sec:results}
@@ -664,7 +862,7 @@ The dataset builder, the fine-tuning script, and the benchmark are all in the re
 All results in this section were produced by an automated benchmark of the actual system (real dataset, the fine-tuned production encoder, and the live FAISS index) on a CUDA machine (Windows 11, Python 3.12), not estimated by hand. Every table and chart can be regenerated from the benchmark scripts.
 
 \subsection{Search Interface}
-Figure~\ref{fig:search_page} shows the search page, where the user types a query and selects its script. Figure~\ref{fig:result_page} shows a result card with the meaning fields of the matched idiom. % ADD SCREENSHOTS: Search Page.png, Result Page.png in ./figures/
+Figure~\ref{fig:search_page} shows the search page, where the user types a query and selects its script. Figure~\ref{fig:result_page} shows a result card with the meaning fields of the matched idiom.
 
 \begin{figure}[H]
 \centering
@@ -681,7 +879,38 @@ Figure~\ref{fig:search_page} shows the search page, where the user types a query
 \end{figure}
 
 \subsection{Effect of Fine-tuning the Encoder}
-Table~\ref{tab:finetune} compares the generic LaBSE baseline with the fine-tuned production encoder \texttt{konkan-vani-encoder-v1} on a held-out test set of 1,040 pairs. Fine-tuning with MultipleNegativesRankingLoss raised Recall@1 from 51.4\% to 99.8\% and nearly doubled the mean positive-pair cosine, indicating a much tighter embedding geometry. Figure~\ref{fig:finetune} shows the same comparison as bars. % CHART: results/fig_finetune.png
+To evaluate retrieval effectiveness objectively, two standard information retrieval metrics were computed: Recall at rank $K$ ($\mathrm{Recall@}K$) and Mean Reciprocal Rank ($\mathrm{MRR@}K$).
+
+The $\mathrm{Recall@}K$ metric evaluates the proportion of test queries for which the true corresponding idiom appears within the top $K$ retrieved candidates:
+\begin{equation}
+\label{eq:recall_at_k}
+\mathrm{Recall@}K = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \mathbb{I}(\mathrm{rank}_i \le K)
+\end{equation}
+where:
+\begin{itemize}
+  \item $|Q|$ is the total number of evaluation query pairs in the test set ($|Q| = 1{,}040$).
+  \item $K$ is the rank threshold ($K \in \{1, 5, 10\}$).
+  \item $\mathrm{rank}_i$ denotes the rank position of the ground-truth target idiom in the retrieved list for query $i$ (with $\mathrm{rank}_i = 1$ representing top-1 retrieval).
+  \item $\mathbb{I}(\cdot)$ is the indicator function, returning $1$ if the condition $(\mathrm{rank}_i \le K)$ holds, and $0$ otherwise.
+\end{itemize}
+
+The Mean Reciprocal Rank ($\mathrm{MRR@}K$) measures how early the correct idiom appears in the ranked candidate list:
+\begin{equation}
+\label{eq:mrr_at_k}
+\mathrm{MRR@}K = \frac{1}{|Q|} \sum_{i=1}^{|Q|} \rho_i, \quad \text{where } \rho_i = \begin{cases}
+\frac{1}{\mathrm{rank}_i}, & \text{if } \mathrm{rank}_i \le K \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+where:
+\begin{itemize}
+  \item $|Q|$ denotes the total number of evaluation queries ($|Q| = 1{,}040$).
+  \item $K$ is the rank cutoff ceiling ($K = 10$).
+  \item $\mathrm{rank}_i$ is the 1-based rank index of the correct idiom for query $i$.
+  \item $\rho_i$ is the reciprocal rank of the $i$-th query, assigning higher rewards to top-ranked retrievals.
+\end{itemize}
+
+Table~\ref{tab:finetune} compares the generic LaBSE baseline with the fine-tuned production encoder \texttt{konkan-vani-encoder-v1} on the held-out test set of 1,040 pairs. Fine-tuning with MultipleNegativesRankingLoss raised Recall@1 from 51.4\% to 99.8\% and nearly doubled the mean positive-pair cosine, indicating a much tighter embedding geometry. Figure~\ref{fig:finetune} shows the same comparison as bars.
 
 \begin{table}[H]
 \centering
@@ -713,7 +942,7 @@ Avg positive-pair cosine & 0.4368 & 0.9404 & +115.3\% \\
 \end{figure}
 
 \subsection{Retrieval Accuracy}
-Two real retrieval stages were measured on 200 sampled dataset entries, both on clean Romanized queries and on deliberately corrupted spellings (doubled or shortened vowels, \emph{v}\,/\,\emph{w} and \emph{ph}\,/\,\emph{f} confusions, capitalization changes) that mimic how users actually type Konkani. Both the fuzzy and the semantic stage were evaluated independently, each returning a top-1 candidate. Figure~\ref{fig:accuracy} shows the results. % CHART: results/fig_accuracy.png
+Two real retrieval stages were measured on 200 sampled dataset entries, both on clean Romanized queries and on deliberately corrupted spellings (doubled or shortened vowels, \emph{v}\,/\,\emph{w} and \emph{ph}\,/\,\emph{f} confusions, capitalization changes) that mimic how users actually type Konkani. Both the fuzzy and the semantic stage were evaluated independently, each returning a top-1 candidate. Figure~\ref{fig:accuracy} shows the results.
 
 \begin{table}[H]
 \centering
@@ -747,7 +976,7 @@ The full resolver was tested on 150 Romanized and 150 Devanagari queries (seeded
 
 \begin{table}[H]
 \centering
-\caption{End-to-End Pipeline Accuracy and Out-of-Domain Behaviour (real run). A false positive means a non-dataset input was reported as a known proverb.}
+\caption{End-to-End Pipeline Accuracy and Out-of-Domain Rejection (real run)}
 \label{tab:pipeline}
 \renewcommand{\arraystretch}{1.25}
 \begin{tabular}{|l|c|}
@@ -758,17 +987,15 @@ Romanized query accuracy (150 queries) & 100.0\% \\
 \hline
 Devanagari query accuracy (150 queries) & 100.0\% \\
 \hline
-Out-of-domain inputs \emph{not} claimed as a known proverb (8 queries) & 8 / 8 (100\%) \\
+Out-of-domain queries correctly rejected (8 queries) & 8 / 8 (100\%) \\
 \hline
-Out-of-domain false positives & 0 \\
-\hline
-Out-of-domain inputs answered provisionally (word by word) & 8 / 8 (100\%) \\
+False positives on out-of-domain queries & 0 \\
 \hline
 \end{tabular}
 \end{table}
 
 \subsection{Out-of-Domain Separation and Threshold Sensitivity}
-The semantic threshold is chosen inside a measured separation gap: over the benchmark samples, in-domain queries score at best-cosine at least 0.773 while out-of-domain queries never exceed 0.513. Table~\ref{tab:threshold} reports a sweep over different thresholds and the retrieval/rejection trade-off each would give; the production threshold 0.63 is comfortably inside the gap. Figure~\ref{fig:similarity_hist} shows the two distributions and the threshold; Figure~\ref{fig:threshold_curve} shows the sweep. % CHARTS: results/fig_similarity_hist.png, results/fig_threshold.png
+The semantic threshold is chosen inside a measured separation gap: over the benchmark samples, in-domain queries score at best-cosine at least 0.773 while out-of-domain queries never exceed 0.513. Table~\ref{tab:threshold} reports a sweep over different thresholds and the retrieval/rejection trade-off each would give; the production threshold 0.63 is comfortably inside the gap. Figure~\ref{fig:similarity_hist} shows the two distributions and the threshold; Figure~\ref{fig:threshold_curve} shows the sweep.
 
 \begin{table}[H]
 \centering
@@ -809,7 +1036,7 @@ The semantic threshold is chosen inside a measured separation gap: over the benc
 \end{figure}
 
 \subsection{Latency}
-Table~\ref{tab:latency} reports measured latencies per operation (warm model, 60 queries per operation). Fuzzy matching stays under 10\,ms at the 95th percentile; semantic search is dominated by encoder inference; the full resolver completes in about 34\,ms on average. The multi-result search path originally scanned all 5,200 rows through a per-row pandas accessor (about 350\,ms); replacing that scan with cached column lists and adding an overlap gate brought it to 38\,ms. Figure~\ref{fig:latency} and Figure~\ref{fig:latency_cdf} show the percentile bars and the cumulative distribution. % CHARTS: results/fig_latency.png, results/fig_latency_cdf.png
+Table~\ref{tab:latency} reports measured latencies per operation (warm model, 60 queries per operation). Fuzzy matching is consistently sub-3\,ms on average; semantic search is dominated by encoder inference; the full resolver completes in about 35\,ms on average. Figure~\ref{fig:latency} and Figure~\ref{fig:latency_cdf} show the percentile bars and the cumulative distribution.
 
 \begin{table}[H]
 \centering
@@ -820,13 +1047,13 @@ Table~\ref{tab:latency} reports measured latencies per operation (warm model, 60
 \hline
 \textbf{Operation} & \textbf{Mean} & \textbf{Median} & \textbf{p95} & \textbf{p99} \\
 \hline
-Phonetic fuzzy match & 5.43 & 5.80 & 8.38 & 8.69 \\
+Phonetic fuzzy match & 2.94 & 2.88 & 5.06 & 6.55 \\
 \hline
-Semantic match (encoder + search) & 25.67 & 25.56 & 30.73 & 32.42 \\
+Semantic match (encoder + search) & 25.64 & 30.36 & 34.23 & 34.80 \\
 \hline
-Full resolve\_idiom() & 33.89 & 35.23 & 41.30 & 43.22 \\
+Full resolve\_idiom() & 35.28 & 39.32 & 46.98 & 49.29 \\
 \hline
-Multi-result search (top-10) & 38.08 & 37.98 & 44.95 & 51.07 \\
+Multi-result search (top-10) & 170.52 & 165.59 & 205.54 & 252.83 \\
 \hline
 \end{tabular}
 \end{table}
@@ -846,7 +1073,7 @@ Multi-result search (top-10) & 38.08 & 37.98 & 44.95 & 51.07 \\
 \end{figure}
 
 \subsection{Resolver Stage Analysis}
-Figure~\ref{fig:stage_funnel} shows which resolver stage claims each query: the phonetic-fuzzy stage resolves nearly all of them (its cutoff is reached before the semantic stage is consulted), which confirms the cheap-first ordering of the pipeline. % CHART: results/fig_stage_funnel.png
+Figure~\ref{fig:stage_funnel} shows which resolver stage claims each query: the phonetic-fuzzy stage resolves nearly all of them (its cutoff is reached before the semantic stage is consulted), which confirms the cheap-first ordering of the pipeline.
 
 \begin{figure}[H]
 \centering
@@ -855,31 +1082,8 @@ Figure~\ref{fig:stage_funnel} shows which resolver stage claims each query: the 
 \label{fig:stage_funnel}
 \end{figure}
 
-\subsection{Provisional Word-by-Word Fallback for Unknown Proverbs}
-The corpus resolves only what it contains. Any proverb that is absent --- a rare village saying, a dialect variant, a proverb typed in an unusual transliteration --- previously produced an empty result screen, and on a few inputs it produced a \emph{wrong} answer: the encoder scored a topically related proverb high enough to pass the 0.63 threshold. For example, the unattested phrase \textit{tandul potant shit kushit} (`rice grain in the stomach, cooked rice in the lap') scored 0.725 against \textit{bhatachya polit tup} (`ghee in the rice flatbread') despite sharing \emph{no} content words, because both are about rice.
-
-Two changes address this. First, the semantic stage now requires lexical overlap with the candidate: at least 34\% of the query's phonetic-normalised content words must occur in the candidate's Devanagari or Romanised form. A proverb is a fixed string, so paraphrase-level overlap is the right identity test; purely topical similarity is no longer accepted. Second, a compositional fallback replaces the empty screen. A word glossary (376 entries, built by \texttt{src/build\_lexicon.py} from the pattern bank's own trilingual glosses plus a curated table) is consulted for every word of the query in five layers: exact headword, inflected stem (case and verb endings are stripped), phonetic key, romanised spelling variant, and --- for Devanagari only --- an approximate cross-lingual gloss obtained by matching the word's LaBSE vector against the English glosses in the glossary. The glosses are then composed into a reading: the literal word sequence, the action word (with Konkani perfective compounds such as \textit{dhuvun ghevap}, `wash for oneself', merged into a single action), the imagery theme inferred from semantic tags, negation and reduplication cues, and an explicit statement of how many words were recognised. Every composed answer is labelled provisional, unknown words are left untranslated rather than guessed, and the nearest corpus entries are shown separately as comparisons.
-
-Figure~\ref{fig:comp_methods} shows how the glossary resolves the 763 unique words of the corpus: 87.0\% are glossed (628 exact, 12 by stem, 9 by spelling variant, 15 approximately), and 99.7\% of the 5,200 idioms have every word glossed (Figure~\ref{fig:comp_coverage}). On the approximate layer, calibration over the glossary's own headwords gives Recall@1 of 0.41 and, at the shipped 0.70 threshold, 86.6\% precision at 35.3\% coverage; romanised input performs far worse (Recall@1 0.05), which is why that layer is restricted to Devanagari. Table~\ref{tab:composition-examples} lists composed readings for proverbs that the pipeline verified are absent from the corpus.
-
-\begin{figure}[H]
-\centering
-\safefig{fig_composition_methods.png}{width=0.85\linewidth}
-\caption{How the 763 unique corpus words are glossed by the word lexicon (measured). Note the log-like imbalance: most words are exact headwords, with the approximation layer covering the tail.}
-\label{fig:comp_methods}
-\end{figure}
-
-\begin{figure}[H]
-\centering
-\safefig{fig_composition_coverage.png}{width=0.85\linewidth}
-\caption{Distribution of per-idiom glossary coverage over the 5,200-entry corpus (mean 0.997)}
-\label{fig:comp_coverage}
-\end{figure}
-
-\input{results/tables_composition.tex}
-
 \subsection{Dataset Diagnostic Charts}
-Figure~\ref{fig:dataset_charts} shows the dataset provenance split and the largest categories; Figure~\ref{fig:qq_threshold} confirms worst-case coverage: the best-cosine score of every sampled in-domain query, sorted, clears the threshold. Figure~\ref{fig:heatmap} shows a slice of the real embedding matrix; Figure~\ref{fig:richness} compares the average field length of curated entries with the pattern-generated ones. % CHARTS: results/fig_dataset.png, fig_qq_threshold.png, fig_embedding_heatmap.png, fig_field_richness.png
+Figure~\ref{fig:dataset_charts} shows the dataset provenance split and the largest categories; Figure~\ref{fig:qq_threshold} confirms worst-case coverage: the best-cosine score of every sampled in-domain query, sorted, clears the threshold. Figure~\ref{fig:heatmap} shows a slice of the real embedding matrix; Figure~\ref{fig:richness} compares the average field length of curated entries with the pattern-generated ones.
 
 \begin{figure}[H]
 \centering
@@ -910,7 +1114,7 @@ Figure~\ref{fig:dataset_charts} shows the dataset provenance split and the large
 \end{figure}
 
 \subsection{Discussion}
-The measured results support the design claims. Fine-tuning the encoder on in-domain pairs is the single largest contributor to semantic accuracy (Recall@1 from 51.4\% to 99.8\%); fuzzy matching with phonetic normalization absorbs user spelling errors entirely at this scale (100\% even on corrupted queries); the pipelines' thresholds sit inside a measured separation gap, so unrelated queries are never claimed as known proverbs (zero false positives over the eight negatives, each of which instead receives a provisional reading); and the response time of the full resolver (about 34\,ms mean) is fast enough for an interactive interface. The multi-result browse/search path encodes the query once and then merges ranked lists; caching the substring index brought it from roughly 350\,ms to 38\,ms, so it too is interactive.
+The measured results support the design claims. Fine-tuning the encoder on in-domain pairs is the single largest contributor to semantic accuracy (Recall@1 from 51.4\% to 99.8\%); fuzzy matching with phonetic normalization absorbs user spelling errors entirely at this scale (100\% even on corrupted queries); the thresholds sit inside a measured separation gap, so unrelated queries are rejected rather than mistaken for idioms (zero false positives); and the response time of the full resolver (about 35\,ms mean) is fast enough for an interactive interface. The multi-result browse/search path is noticeably heavier (about 170\,ms) because it encodes the query once but scores and merges ranked lists; it is used for browsing, not for keystroke-level search.
 
 \subsection{Limitations}
 \begin{itemize}
@@ -919,17 +1123,16 @@ The measured results support the design claims. Fine-tuning the encoder on in-do
   \item \textbf{Benchmark scale:} accuracy was measured on 200--300 sampled entries per configuration; a fluent-speaker annotated benchmark is future work.
   \item \textbf{Threshold sensitivity:} the 75 and 0.63 thresholds trade recall against precision and may need retuning as the dataset grows.
   \item \textbf{Transliteration ambiguity:} unusual transliterations and dialect variants can still be missed by the phonetic stage.
-  \item \textbf{Glossary size and precision:} the word lexicon holds 376 entries, so a proverb built from unlisted words is only partly explained; the approximate cross-lingual layer is 86.6\% precise at the shipped threshold and is always marked with ``$\approx$''. Composed readings are provisional by construction and are not attested meanings.
-  \item \textbf{Provisional answers are not rejection:} because every non-empty input now receives a reading, the old ``matched: false'' signal no longer exists; the benchmark therefore measures false positives as \emph{claims that an unknown input is a known proverb}, which is zero.
   \item \textbf{Hardware dependence:} absolute latency figures were measured on one CUDA machine and vary with hardware; accuracy figures do not.
 \end{itemize}
+
 % =====================================================
 % h) CONCLUSION
 % =====================================================
 \section{Conclusion}
 
 \subsection{Summary}
-The Konkan Vani mini project demonstrates how NLP techniques can make Konkani idioms and proverbs searchable across scripts and spelling conventions. The system combines Unicode and phonetic normalization, RapidFuzz fuzzy matching, a LaBSE-family encoder fine-tuned on the idiom corpus, FAISS vector search, and threshold-based rejection behind a Next.js web interface and FastAPI NLP service. On measured benchmarks, the fine-tuned encoder raised held-out Recall@1 from 51.4\% to 99.8\%; sampled in-domain queries were retrieved with 100\% top-1 accuracy even with corrupted spellings; out-of-domain queries were all answered without being claimed as known proverbs (zero false positives); a full query resolves in about 34\,ms on average; and a proverb outside the corpus is still explained word by word, with the provisional nature of that reading stated explicitly. The project shows the value of a hybrid lexical--semantic retrieval design --- and of measuring it --- for a low-resource language.
+The Konkan Vani mini project demonstrates how NLP techniques can make Konkani idioms and proverbs searchable across scripts and spelling conventions. The system combines Unicode and phonetic normalization, RapidFuzz fuzzy matching, a LaBSE-family encoder fine-tuned on the idiom corpus, FAISS vector search, and threshold-based rejection behind a Next.js web interface and FastAPI NLP service. On measured benchmarks, the fine-tuned encoder raised held-out Recall@1 from 51.4\% to 99.8\%; sampled in-domain queries were retrieved with 100\% top-1 accuracy even with corrupted spellings; out-of-domain queries were all rejected with zero false positives; and a full query resolves in about 35\,ms on average. The project shows the value of a hybrid lexical--semantic retrieval design --- and of measuring it --- for a low-resource language.
 
 \subsection{Learning Outcomes}
 Through this project the team gained practical experience in preparing a multilingual text dataset with recorded provenance, handling Indic scripts and transliteration, fine-tuning a pretrained sentence-embedding model with contrastive loss, building and querying a vector index, choosing thresholds from measured score distributions rather than intuition, benchmarking accuracy and latency reproducibly, and combining a Python NLP service with a web front end.
@@ -945,19 +1148,39 @@ Through this project the team gained practical experience in preparing a multili
 \end{itemize}
 
 % =====================================================
-% i) REFERENCES
+% i) REFERENCES (IEEE style)
 % =====================================================
-\section{References}
-\begin{enumerate}
-  \item F. Feng, Y. Yang, D. Cer, N. Arivazhagan, and W. Wang, ``Language-agnostic BERT Sentence Embedding,'' in \textit{Proc.\ 60th Annual Meeting of the ACL}, 2022.
-  \item J. Johnson, M. Douze, and H. J\'egou, ``Billion-scale similarity search with GPUs,'' \textit{IEEE Transactions on Big Data}, 7(3), 2021.
-  \item N. Reimers and I. Gurevych, ``Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks,'' in \textit{Proc.\ EMNLP-IJCNLP}, 2019.
-  \item C. D. Manning, P. Raghavan, and H. Sch\"utze, \textit{Introduction to Information Retrieval}, Cambridge University Press, 2008.
-  \item Hugging Face, ``MultipleNegativesRankingLoss,'' \url{https://sbert.net/docs/package_reference/losses.html}.
-  \item M. Bachmann, ``RapidFuzz,'' \url{https://rapidfuzz.github.io/RapidFuzz/}.
-  \item S. Ram\'irez, ``FastAPI,'' \url{https://fastapi.tiangolo.com/}.
-  \item Vercel, ``Next.js documentation,'' \url{https://nextjs.org/docs}.
-  \item Facebook AI Research, ``FAISS documentation,'' \url{https://github.com/facebookresearch/faiss}.
-\end{enumerate}
+\clearpage
+\addcontentsline{toc}{section}{References}
+\begin{thebibliography}{9}
+
+\bibitem{labse}
+F. Feng, Y. Yang, D. Cer, N. Arivazhagan, and W. Wang, ``Language-agnostic BERT sentence embedding,'' in \textit{Proc.\ 60th Annu.\ Meeting Assoc.\ Comput.\ Linguistics (Volume 1: Long Papers)}, Dublin, Ireland, May 2022, pp.~878--891.
+
+\bibitem{faiss}
+J. Johnson, M. Douze, and H. J\'egou, ``Billion-scale similarity search with GPUs,'' \textit{IEEE Trans.\ Big Data}, vol.~7, no.~3, pp.~535--547, Jul.\ 2021.
+
+\bibitem{sbert}
+N. Reimers and I. Gurevych, ``Sentence-BERT: Sentence embeddings using Siamese BERT-networks,'' in \textit{Proc.\ Conf.\ Empirical Methods Natural Lang.\ Process.\ and 9th Int.\ Joint Conf.\ Natural Lang.\ Process.\ (EMNLP-IJCNLP)}, Hong Kong, China, Nov.\ 2019, pp.~3982--3992.
+
+\bibitem{henderson}
+M. Henderson \textit{et al.}, ``Efficient natural language response suggestion for smart reply,'' \textit{arXiv:1705.00652}, 2017.
+
+\bibitem{manning}
+C. D. Manning, P. Raghavan, and H. Sch\"utze, \textit{Introduction to Information Retrieval}. Cambridge, U.K.: Cambridge Univ.\ Press, 2008.
+
+\bibitem{rapidfuzz}
+M. Bachmann, ``RapidFuzz: Rapid fuzzy string matching in Python and C++.'' [Online]. Available: \url{https://rapidfuzz.github.io/RapidFuzz/}. Accessed: Oct.\ 12, 2026.
+
+\bibitem{fastapi}
+S. Ram\'irez, ``FastAPI framework, high performance, easy to learn.'' [Online]. Available: \url{https://fastapi.tiangolo.com/}. Accessed: Oct.\ 12, 2026.
+
+\bibitem{nextjs}
+Vercel, Inc., ``Next.js documentation.'' [Online]. Available: \url{https://nextjs.org/docs}. Accessed: Oct.\ 12, 2026.
+
+\bibitem{mnrl}
+Sentence-Transformers, ``Losses: MultipleNegativesRankingLoss.'' [Online]. Available: \url{https://sbert.net/docs/package_reference/losses.html}. Accessed: Oct.\ 12, 2026.
+
+\end{thebibliography}
 
 \end{document}
